@@ -1,12 +1,7 @@
-import pickle
-
-from sklearn.feature_extraction.text import TfidfVectorizer
 import re
-
-input_data_path = '/home/honza/School/Bakalářka_Pr5/CNO_IPTC_train.txt'
-# input_data_path = '/home/honza/School/Bakalářka_Pr5/test1'
-output_matrix_path = '/home/honza/School/Bakalářka_Pr5/vectorizer'
-output_topics_path = '/home/honza/School/Bakalářka_Pr5/topics'
+from sklearn.feature_extraction.text import TfidfVectorizer
+from data_utils import save_sparse_csr
+import config
 
 
 def build_corpus_and_topics(file_path):
@@ -43,12 +38,11 @@ def build_corpus_and_topics(file_path):
 
 
 if __name__ == '__main__':
-    vectorizer = TfidfVectorizer()
-    corpus, topics = build_corpus_and_topics(input_data_path)
+    vectorizer = TfidfVectorizer(ngram_range=(1, 3), sublinear_tf=True, norm='l2', analyzer='word')
+    corpus, topics = build_corpus_and_topics(config.training_data_path)
     sparse_matrix = vectorizer.fit_transform(corpus)
 
-    with open(output_matrix_path, 'wb') as handle:
-        pickle.dump(sparse_matrix, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    save_sparse_csr(config.matrix_path, sparse_matrix)
 
-    with open(output_topics_path, 'wb') as handle:
-        pickle.dump(topics, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open(config.topics_path, 'wb') as handle:
+    #     pickle.dump(topics, handle, protocol=pickle.HIGHEST_PROTOCOL)
