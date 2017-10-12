@@ -1,24 +1,19 @@
-import pickle
-import re
-
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MultiLabelBinarizer
 
 import config
-from data_utils import save_sparse_csr
+from data_utils import save_sparse_csr, save_pickle
 
 
-# Loads corpus into the memory. I could use yield to avoid this behavior but that would require processing the articles
-# and article topics separately, since I don't want to write to global variables from within the function body
-def build_corpus_and_topics(file_path):
+# Returns data and topics matrix
+def build_corpus_and_topics(raw_data_file_path):
     pattern = r'<article id="([0-9]+)" topics="(.*)">'
-    corpus = []
-    topics = []
+    corpus, topics = []
     current_article = ""
     article_id = -1  # I am not using the provided id because I need the id to match the index within corpus
-    with open(file_path, 'r', encoding='utf-8') as f:
-        for line in f:
+    with open(raw_data_file_path, 'r', encoding='utf-8') as handler:
+        for line in handler:
             if line.startswith('<'):
                 if line == '</article>\n':
                     corpus.append(current_article)
@@ -36,6 +31,9 @@ def build_corpus_and_topics(file_path):
 
             current_article += line
 
+    if len(corpus) != len(topics):
+        raise ValueError("Error: matrix dimensions do not match")
+
     return corpus, topics
 
 
@@ -44,10 +42,6 @@ if __name__ == '__main__':
     binarizer = MultiLabelBinarizer()
     corpus, topics = build_corpus_and_topics(config.training_data_path)
     print("Articles loaded")
-
-    if len(corpus) != len(topics):
-        print("Error: matrix dimensions do not match")
-        exit(1)
 
     print("Building the data matrix using the TfidfVectorizer")
     data_matrix = vectorizer.fit_transform(corpus)
@@ -62,9 +56,7 @@ if __name__ == '__main__':
     np.save(config.topics_matrix_path, label_matrix)
 
     print("Saving the vectorizer to file")
-    with open(config.data_vectorizer_path, 'wb') as handle:
-        pickle.dump(vectorizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    save_pickle(config.data_vectorizer_path, vectorizer)
 
     print("Saving the binarizer to file")
-    with open(config.topic_binarizer_path, 'wb') as handle:
-        pickle.dump(binarizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    save_pickle(config.topic_binarizer_path, binarizer)
