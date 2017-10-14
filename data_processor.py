@@ -1,3 +1,4 @@
+import re
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MultiLabelBinarizer
@@ -9,9 +10,10 @@ from data_utils import save_sparse_csr, save_pickle
 # Returns data and topics matrix
 def build_corpus_and_topics(raw_data_file_path):
     pattern = r'<article id="([0-9]+)" topics="(.*)">'
-    corpus, topics = []
+    corpus = []
+    topics = []
     current_article = ""
-    article_id = -1  # I am not using the provided id because I need the id to match the index within corpus
+    iteration = 0
     with open(raw_data_file_path, 'r', encoding='utf-8') as handler:
         for line in handler:
             if line.startswith('<'):
@@ -23,10 +25,10 @@ def build_corpus_and_topics(raw_data_file_path):
                 match_obj = re.match(pattern, line)
                 if match_obj:
                     topics.append(match_obj.group(2).split(' '))
-                    article_id += 1
+                    iteration += 1
                     if current_article:
                         print("Warning: Non empty article string")
-                    print("Article with id " + str(article_id) + " loaded")
+                    print(str(iteration) + ". article loaded")
                     continue
 
             current_article += line

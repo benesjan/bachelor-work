@@ -1,3 +1,4 @@
+# coding: utf-8
 data_directory = './data'
 
 # Raw data
