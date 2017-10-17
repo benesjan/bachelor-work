@@ -1,9 +1,21 @@
 # coding: utf-8
-import config
 import numpy as np
-from data_utils import load_pickle
-from data_processor import build_corpus_and_topics
 from sklearn.metrics import precision_recall_fscore_support as prfs
+
+import config
+from data_processor import build_corpus_and_topics
+from data_utils import load_pickle
+
+
+# Returns how many articles were not labeled
+def calculate_rows_without_topic(y_pred):
+    with_predictions = 0
+    for row in y_pred:
+        for x in row:
+            if x != 0:
+                with_predictions += 1
+                break
+    return y_pred.shape[0] - with_predictions
 
 
 def RCut(y, rank=3):
@@ -37,8 +49,11 @@ if __name__ == '__main__':
     print("Classifying the data")
     Y_pred = classifier.predict(X)
 
-    Y_pred_bin = RCut(Y_pred)
     Y_true_bin = RCut(Y_true)
+    # Y_pred_bin = RCut(Y_pred)
 
-    P, R, F, S = prfs(Y_true, Y_pred_bin, average="samples")
+    print("Number of articles without predicted topic: {0} of {1}"
+          .format(calculate_rows_without_topic(Y_pred), Y_pred.shape[0]))
+
+    P, R, F, S = prfs(Y_true_bin, Y_pred, average="samples")
     print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
