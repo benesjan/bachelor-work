@@ -18,7 +18,7 @@ from data_utils import load_pickle
 #     return y_pred.shape[0] - with_predictions
 
 
-def RCut(y, rank=3):
+def r_cut(y, rank=3):
     """Apply rank-based thresholding on given matrix.
 
     In RCut (also known as `k-per-doc`), only `rank` best topics are assigned to
@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     # Ensures at least 2 predicted topics for each article
     # 2 topics are optimal for max F on testing data
-    y_pred_min_topics = RCut(y_true, 2)
+    y_pred_min_topics = r_cut(y_true, 2)
 
     # Returns matrix where each elements is set to True if the element's value is bigger than threshold
     y_pred_T = y_pred_raw > 0.16  # -0.14 for 1 min topic

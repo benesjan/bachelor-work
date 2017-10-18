@@ -13,8 +13,9 @@ def build_corpus_and_topics(raw_data_file_path):
     corpus, topics = [], []
     current_article = ""
 
+    articles_processed = 0
     with open(raw_data_file_path, 'r', encoding='utf-8') as handler:
-        for i, line in enumerate(handler):
+        for line in handler:
             if line.startswith('<'):
                 if line == '</article>\n':
                     corpus.append(current_article)
@@ -24,9 +25,10 @@ def build_corpus_and_topics(raw_data_file_path):
                 match_obj = re.match(pattern, line)
                 if match_obj:
                     topics.append(match_obj.group(2).split(' '))
+                    articles_processed += 1
                     if current_article:
                         print("Warning: Non empty article string")
-                    print(str(i) + ". article loaded")
+                    print(str(articles_processed) + ". article loaded")
                     continue
 
             current_article += line
