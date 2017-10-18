@@ -1,4 +1,6 @@
 import re
+import numpy as np
+from sklearn.metrics import precision_recall_fscore_support as prfs
 
 import config
 from data_utils import load_pickle
@@ -14,8 +16,8 @@ def build_topics_and_vectorized_paragraphs(raw_data_file_path, vectorizer, n_art
         for line in handler:
             if line.startswith('<'):
                 if line == '</article>\n':
-                    articles.append(current_article)
-                    current_article.clear()
+                    articles.append(vectorizer.transform(current_article))
+                    current_article = []
                     if articles_processed == n_articles:
                         break
                     continue
@@ -29,9 +31,7 @@ def build_topics_and_vectorized_paragraphs(raw_data_file_path, vectorizer, n_art
                     print(str(articles_processed) + ". article loaded")
                     continue
 
-            print(line)
-            print(vectorizer.transform(line))
-            current_article.append(vectorizer.transform(line))
+            current_article.append(line)
 
     if len(articles) != len(topics):
         raise ValueError("Error: matrix dimensions do not match")
@@ -44,11 +44,17 @@ if __name__ == '__main__':
     vectorizer = load_pickle(config.data_vectorizer_path)
     binarizer = load_pickle(config.topic_binarizer_path)
 
-    articles, topics = build_topics_and_vectorized_paragraphs(config.testing_data_path, vectorizer)
+    articles, topics = build_topics_and_vectorized_paragraphs(config.testing_data_path, vectorizer, 2000)
 
     article_topics = []
     for article in articles:
-        for paragraph in article:
-            print(binarizer.inverse_transform(classifier.predict(paragraph)))
+        y_rows = classifier.predict(article)
+        y_raw = np.sum(y_rows, 0)
+        article_topics.append(y_raw)
 
-    print("Actual topics: " + str(topics))
+    y_pred_raw = np.array(article_topics)
+    y_pred = y_pred_raw > 0
+    y_true = binarizer.transform(topics)
+
+    P, R, F, S = prfs(y_true, y_pred, average="samples")
+    print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
