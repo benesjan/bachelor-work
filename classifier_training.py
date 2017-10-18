@@ -11,7 +11,7 @@ if __name__ == '__main__':
     Y = np.load(config.topics_matrix_path)
 
     # The process of data vectorization and learning could be streamlined by using Pipeline
-    classifier = OneVsRestClassifier(LinearSVC())
+    classifier = OneVsRestClassifier(LinearSVC(), n_jobs=4)
     print("Training the classifier")
     classifier.fit(X, Y)
 

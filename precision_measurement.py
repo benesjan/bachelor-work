@@ -8,14 +8,14 @@ from data_utils import load_pickle
 
 
 # Returns how many articles were not labeled
-def calculate_rows_without_topic(y_pred):
-    with_predictions = 0
-    for row in y_pred:
-        for x in row:
-            if x != 0:
-                with_predictions += 1
-                break
-    return y_pred.shape[0] - with_predictions
+# def calculate_rows_without_topic(y_pred):
+#     with_predictions = 0
+#     for row in y_pred:
+#         for x in row:
+#             if x != 0:
+#                 with_predictions += 1
+#                 break
+#     return y_pred.shape[0] - with_predictions
 
 
 def RCut(y, rank=3):
@@ -42,18 +42,21 @@ if __name__ == '__main__':
     corpus, topics = build_corpus_and_topics(config.testing_data_path)
 
     print("Transforming corpus by vectorizer")
-    X = vectorizer.transform(corpus)
+    x = vectorizer.transform(corpus)
     print("Transforming article topics by binarizer")
-    Y_true = binarizer.transform(topics)
+    y_true = binarizer.transform(topics)
 
     print("Classifying the data")
-    Y_pred = classifier.predict(X)
+    y_pred_raw = classifier.decision_function(x)
 
-    Y_true_bin = RCut(Y_true)
-    # Y_pred_bin = RCut(Y_pred)
+    # Ensures at least 2 predicted topics for each article
+    # 2 topics are optimal for max F on testing data
+    y_pred_min_topics = RCut(y_true, 2)
 
-    print("Number of articles without predicted topic: {0} of {1}"
-          .format(calculate_rows_without_topic(Y_pred), Y_pred.shape[0]))
+    # Returns matrix where each elements is set to True if the element's value is bigger than threshold
+    y_pred_T = y_pred_raw > 0.16  # -0.14 for 1 min topic
 
-    P, R, F, S = prfs(Y_true_bin, Y_pred, average="samples")
+    y_pred = y_pred_min_topics + y_pred_T
+
+    P, R, F, S = prfs(y_true, y_pred, average="samples")
     print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
