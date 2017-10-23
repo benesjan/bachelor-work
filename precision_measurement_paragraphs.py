@@ -1,26 +1,31 @@
 import re
+
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
 import config
 from data_utils import load_pickle
-# from precision_measurement import r_cut
 
 
-def build_topics_and_vectorized_paragraphs(raw_data_file_path, vectorizer, n_articles=1):
+def build_topics_and_paragraphs(raw_data_file_path, n_articles=1):
     pattern = r'<article id="([0-9]+)" topics="(.*)">'
     articles, topics = [], []
     current_article = []
 
     articles_processed = 0
+    article_length = 0
     with open(raw_data_file_path, 'r', encoding='utf-8') as handler:
         for line in handler:
             if line.startswith('<'):
                 if line == '</article>\n':
-                    articles.append(vectorizer.transform(current_article))
-                    current_article = []
+                    articles.append({
+                        'paragraphs': current_article,
+                        'length': article_length
+                    })
                     if articles_processed == n_articles:
                         break
+                    article_length = 0
+                    current_article = []
                     continue
 
                 match_obj = re.match(pattern, line)
@@ -32,6 +37,7 @@ def build_topics_and_vectorized_paragraphs(raw_data_file_path, vectorizer, n_art
                     print(str(articles_processed) + ". article loaded")
                     continue
 
+            article_length += len(line)
             current_article.append(line)
 
     if len(articles) != len(topics):
@@ -40,39 +46,36 @@ def build_topics_and_vectorized_paragraphs(raw_data_file_path, vectorizer, n_art
     return articles, topics
 
 
+def compute_weights(article):
+    weights = []
+    for paragraph in article['paragraphs']:
+        weights.append(len(paragraph) / article['length'])
+        # weights.append(1)
+    return np.array(weights)
+
+
 if __name__ == '__main__':
     classifier = load_pickle(config.classifier_path)
     vectorizer = load_pickle(config.data_vectorizer_path)
     binarizer = load_pickle(config.topic_binarizer_path)
 
-    articles, topics = build_topics_and_vectorized_paragraphs(config.testing_data_path, vectorizer, 2000)
+    articles, topics = build_topics_and_paragraphs(config.testing_data_path, 2000)
     print("Creating paragraph based predictions")
 
-    # article_topics = []
-    # threshold = 0.12  # optimal value
-    # for article in articles:
-    #     y_dec = classifier.decision_function(article) # article list contains separate paragraphs
-    #     y_rows = r_cut(y_dec, 1) + (y_dec > threshold)
-    #     y_raw = np.sum(y_rows, 0)
-    #     article_topics.append(y_raw)
-    #
-    # print("Merging predictions to single array")
-    # y_pred_raw = np.array(article_topics)
-    # y_pred = y_pred_raw > 0
-    # y_true = binarizer.transform(topics)
-
-    threshold = 0.06 # optimal value
     article_topics = []
     for article in articles:
-        y_dec = classifier.decision_function(article)  # article list contains separate paragraphs
-        y_rows = (y_dec > threshold)
-        y_raw = np.sum(y_rows, 0)
-        article_topics.append(y_raw)
+        y_dec_article = classifier.decision_function(vectorizer.transform(article['paragraphs']))
+        weights = compute_weights(article)
+
+        # vectorized way of multiplying the matrix rows by weights and summing the rows into one
+        y_dec_weighted = np.dot(np.transpose(y_dec_article > 0), np.transpose(weights))
+
+        article_topics.append(y_dec_weighted)
+        # article_topics.append(np.sum(y_dec_article > threshold, 0))
 
     print("Merging predictions to single array")
-    y_pred_raw = np.array(article_topics)
-    y_pred = y_pred_raw > 0
+    y_pred = np.array(article_topics) > 0
     y_true = binarizer.transform(topics)
 
     P, R, F, S = prfs(y_true, y_pred, average="samples")
-    print('threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (threshold, F, P, R))
+    print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
