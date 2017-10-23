@@ -49,12 +49,11 @@ if __name__ == '__main__':
     print("Classifying the data")
     y_pred_raw = classifier.decision_function(x)
 
-    # Ensures at least 2 predicted topics for each article
-    # 2 topics are optimal for max F on testing data
-    y_pred_min_topics = r_cut(y_true, 2)
+    # Ensures at least 1 predicted topic for each article
+    y_pred_min_topics = r_cut(y_pred_raw, 1)
 
     # Returns matrix where each elements is set to True if the element's value is bigger than threshold
-    y_pred_T = y_pred_raw > 0.16  # -0.14 for 1 min topic
+    y_pred_T = y_pred_raw > -0.31  # -0.31 for 1 min topic
 
     y_pred = y_pred_min_topics + y_pred_T
 
