@@ -42,5 +42,5 @@ if __name__ == '__main__':
 
         print("\nFalse negatives: ")
         for false_negative in false_negatives:
-            print(false_negative + (" - IN" if false_positive in y_transformed_paragraphs_set else " - NOT in")
+            print(false_negative + (" - IN" if false_negative in y_transformed_paragraphs_set else " - NOT in")
                   + " paragraphs")
