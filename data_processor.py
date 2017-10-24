@@ -8,7 +8,7 @@ from data_utils import save_sparse_csr, save_pickle
 
 
 # Returns data and topics lists in a not-vectorized form
-def build_corpus_and_topics(raw_data_file_path):
+def build_corpus_and_topics(raw_data_file_path, n_articles=-1):
     pattern = r'<article id="([0-9]+)" topics="(.*)">'
     corpus, topics = [], []
     current_article = ""
@@ -19,6 +19,8 @@ def build_corpus_and_topics(raw_data_file_path):
             if line.startswith('<'):
                 if line == '</article>\n':
                     corpus.append(current_article)
+                    if articles_processed == n_articles:
+                        break
                     current_article = ""
                     continue
 

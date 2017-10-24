@@ -7,13 +7,12 @@ import config
 from data_utils import load_pickle
 
 
-def build_topics_and_paragraphs(raw_data_file_path, n_articles=1):
+def build_topics_and_paragraphs(raw_data_file_path, n_articles=-1):
     pattern = r'<article id="([0-9]+)" topics="(.*)">'
-    articles, topics = [], []
-    current_article = []
 
-    articles_processed = 0
-    article_length = 0
+    articles, topics, current_article = [], [], []
+    articles_processed, article_length = 0, 0
+
     with open(raw_data_file_path, 'r', encoding='utf-8') as handler:
         for line in handler:
             if line.startswith('<'):
@@ -68,7 +67,7 @@ if __name__ == '__main__':
         weights = compute_weights(article)
 
         # vectorized way of multiplying the matrix rows by weights and summing the rows into one
-        y_dec_weighted = np.dot(np.transpose(y_dec_article > 0.04), np.transpose(weights))
+        y_dec_weighted = np.dot(np.transpose(y_dec_article), np.transpose(weights))
 
         article_topics.append(y_dec_weighted)
         # article_topics.append(np.sum(y_dec_article > threshold, 0))
