@@ -68,7 +68,7 @@ if __name__ == '__main__':
         weights = compute_weights(article)
 
         # vectorized way of multiplying the matrix rows by weights and summing the rows into one
-        y_dec_weighted = np.dot(np.transpose(y_dec_article > 0), np.transpose(weights))
+        y_dec_weighted = np.dot(np.transpose(y_dec_article > 0.04), np.transpose(weights))
 
         article_topics.append(y_dec_weighted)
         # article_topics.append(np.sum(y_dec_article > threshold, 0))
