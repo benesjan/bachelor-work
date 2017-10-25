@@ -5,6 +5,8 @@ data_directory = './data'
 training_data_path = data_directory + '/CNO_IPTC_train.txt'
 testing_data_path = data_directory + '/CNO_IPTC_test.txt'
 
+held_out_data_path = data_directory + '/held_out.txt'
+
 # Data processed by vectorizer and binarizer
 data_matrix_path = data_directory + '/matrix.npz'
 topics_matrix_path = data_directory + '/topics.npy'

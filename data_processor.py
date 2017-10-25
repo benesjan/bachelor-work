@@ -41,11 +41,32 @@ def build_corpus_and_topics(raw_data_file_path, n_articles=-1):
     return corpus, topics
 
 
+def generate_held_out_data(source_file_path, target_file_path, nth_article=10):
+    append = False
+    articles_processed = 0
+
+    with open(source_file_path, 'r', encoding='utf-8') as source, open(target_file_path, 'a',
+                                                                       encoding='utf-8') as target:
+        for line in source:
+            if line.startswith('<article') and articles_processed % nth_article == 0:
+                append = True
+
+            if append:
+                target.write(line)
+
+            if line == '</article>\n':
+                articles_processed += 1
+                append = False
+
+
 if __name__ == '__main__':
     vectorizer = TfidfVectorizer(ngram_range=(1, 1), sublinear_tf=True, norm='l2', analyzer='word')
     binarizer = MultiLabelBinarizer()
     corpus, topics = build_corpus_and_topics(config.training_data_path)
     print("Articles loaded")
+
+    print("Generating held-out data")
+    generate_held_out_data(config.training_data_path, config.held_out_data_path)
 
     print("Building the data matrix using the TfidfVectorizer")
     data_matrix = vectorizer.fit_transform(corpus)
