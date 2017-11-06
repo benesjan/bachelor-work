@@ -2,9 +2,10 @@
 data_directory = './data'
 
 # Raw data
-training_data_path = data_directory + '/CNO_IPTC_train.txt'
+training_data_raw_path = data_directory + '/CNO_IPTC_train.txt'
 testing_data_path = data_directory + '/CNO_IPTC_test.txt'
 
+training_data_path = data_directory + '/training_processed.txt'
 held_out_data_path = data_directory + '/held_out.txt'
 
 # Data processed by vectorizer and binarizer

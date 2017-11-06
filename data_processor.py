@@ -41,32 +41,37 @@ def build_corpus_and_topics(raw_data_file_path, n_articles=-1):
     return corpus, topics
 
 
-def generate_held_out_data(source_file_path, target_file_path, nth_article=10):
-    append = False
+# Creates 2 files. One contains held-out data and the other one training data
+def separate_data(source_file_path, held_out_path, training_data_path, nth_article=10):
+    append_training = True
     articles_processed = 0
 
-    with open(source_file_path, 'r', encoding='utf-8') as source, open(target_file_path, 'a',
-                                                                       encoding='utf-8') as target:
+    with open(source_file_path, 'r', encoding='utf-8') as source, \
+            open(held_out_path, 'a', encoding='utf-8') as held_out, \
+            open(training_data_path, 'a', encoding='utf-8') as training:
         for line in source:
             if line.startswith('<article') and articles_processed % nth_article == 0:
-                append = True
+                append_training = False
 
-            if append:
-                target.write(line)
+            if append_training:
+                training.write(line)
+            else:
+                held_out.write(line)
 
             if line == '</article>\n':
                 articles_processed += 1
-                append = False
+                append_training = True
 
 
 if __name__ == '__main__':
     vectorizer = TfidfVectorizer(ngram_range=(1, 1), sublinear_tf=True, norm='l2', analyzer='word')
     binarizer = MultiLabelBinarizer()
+
+    print("Separating held-out from training data")
+    separate_data(config.training_data_raw_path, config.held_out_data_path, config.training_data_path)
+
     corpus, topics = build_corpus_and_topics(config.training_data_path)
     print("Articles loaded")
-
-    print("Generating held-out data")
-    generate_held_out_data(config.training_data_path, config.held_out_data_path)
 
     print("Building the data matrix using the TfidfVectorizer")
     data_matrix = vectorizer.fit_transform(corpus)
