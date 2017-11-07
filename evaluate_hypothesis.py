@@ -1,10 +1,9 @@
-import config
-from data_processor import build_corpus_and_topics
-from data_utils import load_pickle
-from precision_measurement_paragraphs import build_topics_and_paragraphs
+from generate_data_and_instances import build_corpus_and_topics
+from custom_imports import config
+from custom_imports.classifier_functions import predict_tuned
+from custom_imports.utils import load_pickle, build_topics_and_paragraphs
 
 if __name__ == '__main__':
-    classifier = load_pickle(config.classifier_path)
     vectorizer = load_pickle(config.data_vectorizer_path)
     binarizer = load_pickle(config.topic_binarizer_path)
 
@@ -12,7 +11,7 @@ if __name__ == '__main__':
     corpus_paragraphs, topics_ = build_topics_and_paragraphs(config.held_out_data_path)
 
     x = vectorizer.transform(corpus)
-    y = classifier.predict(x)
+    y = predict_tuned(x)
 
     number_of_articles = len(y)
 
@@ -23,7 +22,7 @@ if __name__ == '__main__':
         current_topics = set(topics[i])
 
         x_paragraphs = vectorizer.transform(corpus_paragraphs[i]['paragraphs'])
-        y_transformed_paragraphs_list = binarizer.inverse_transform(classifier.predict(x_paragraphs))
+        y_transformed_paragraphs_list = binarizer.inverse_transform(predict_tuned(x_paragraphs))
         y_transformed_paragraphs_set = set()
         y_transformed_paragraphs_set.update(*y_transformed_paragraphs_list)
 
@@ -34,7 +33,7 @@ if __name__ == '__main__':
         fn_paragraphs += len(current_topics - y_transformed_paragraphs_set)
 
     print("Full articles (per 1 classification) - false positives: %.2f, false negatives: %.2f" % (
-        fp_articles/number_of_articles, fn_articles/number_of_articles))
+        fp_articles / number_of_articles, fn_articles / number_of_articles))
 
     print("Per paragraphs (per 1 classification) - false positives: %.2f, false negatives: %.2f" % (
-        fp_paragraphs/number_of_articles, fn_paragraphs/number_of_articles))
+        fp_paragraphs / number_of_articles, fn_paragraphs / number_of_articles))
