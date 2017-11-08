@@ -30,10 +30,9 @@ if __name__ == '__main__':
         y_dec_weighted = np.dot(np.transpose(y_dec_article), np.transpose(weights))
 
         article_topics.append(y_dec_weighted)
-        # article_topics.append(np.sum(y_dec_article > threshold, 0))
 
     print("Merging predictions to single array")
-    y_pred = np.array(article_topics) > 0
+    y_pred = np.array(article_topics) > -0.67  # Ideal threshold
     y_true = binarizer.transform(topics)
 
     P, R, F, S = prfs(y_true, y_pred, average="samples")
