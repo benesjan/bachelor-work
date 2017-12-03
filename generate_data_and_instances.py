@@ -50,6 +50,9 @@ if __name__ == '__main__':
     print("Saving the binarizer to file")
     save_pickle(config.topic_binarizer_path, binarizer)
 
+    print("Removing unnecessary variables from memory")
+    vectorizer, binarizer, corpus, topics = None, None, None, None
+
     classifier = OneVsRestClassifier(LinearSVC(), n_jobs=4)
     print("Training the classifier")
     classifier.fit(X, Y)
