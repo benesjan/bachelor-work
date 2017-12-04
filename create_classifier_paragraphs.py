@@ -13,6 +13,9 @@ if __name__ == '__main__':
     articles, topics = build_topics_and_paragraphs(config.training_data_path)
     inversed_topics = binarizer.transform(topics)
 
+    print("Removing binarizer from memory")
+    binarizer = None
+
     threshold = 0
 
     x_list = []
@@ -33,21 +36,23 @@ if __name__ == '__main__':
         if i != 0 and i % one_percent == 0:
             print("{0} % done".format(i / one_percent))
 
+    print("Removing unnecessary variables from memory")
+    vectorizer, classifier, corpus, topics, inversed_topics = None, None, None, None, None
+
     print("Building training matrices")
     x = sp.sparse.vstack(x_list, format='csr')
+    x_list = None
+
     y_raw = sp.vstack(y_list)
+    y_list = None
 
     # set 0 values to -1000000 to make the topics which were not in the original article irrelevant
     y_raw[y_raw == 0] = -1000000
     y = r_cut(y_raw, 1) + (y_raw > threshold)
-
-    print("Removing unnecessary variables from memory")
-    vectorizer, binarizer, classifier, corpus, topics, x_list, y_list, inversed_topics \
-        = None, None, None, None, None, None, None, None
 
     classifier_paragraphs = OneVsRestClassifier(LinearSVC(), n_jobs=4)
     print("Training the classifier")
     classifier_paragraphs.fit(x, y)
 
     print("Saving the classifier to file")
-    save_pickle(config.classifier_paragraphs_path, classifier)
+    save_pickle(config.classifier_paragraphs_path, classifier_paragraphs)

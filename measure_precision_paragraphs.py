@@ -14,11 +14,11 @@ def compute_weights(article):
 
 
 if __name__ == '__main__':
-    classifier = load_pickle(config.classifier_path)
+    classifier = load_pickle(config.classifier_paragraphs_path)
     vectorizer = load_pickle(config.data_vectorizer_path)
     binarizer = load_pickle(config.topic_binarizer_path)
 
-    articles, topics = build_topics_and_paragraphs(config.testing_data_path, 2000)
+    articles, topics = build_topics_and_paragraphs(config.testing_data_path)
     print("Creating paragraph based predictions")
 
     article_topics = []
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         article_topics.append(y_dec_weighted)
 
     print("Merging predictions to single array")
-    y_pred = np.array(article_topics) > -0.67  # Ideal threshold
+    y_pred = np.array(article_topics) > -0.95  # Ideal threshold (tested on held-out data)
     y_true = binarizer.transform(topics)
 
     P, R, F, S = prfs(y_true, y_pred, average="samples")
