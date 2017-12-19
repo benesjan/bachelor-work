@@ -21,13 +21,17 @@ if __name__ == '__main__':
     x_list = []
     y_list = []
 
+    # used only for percentage printout
     number_of_articles = len(articles)
     one_percent = int(number_of_articles / 100) if number_of_articles > 100 else 1
 
     print("Processing the training data")
     for i in range(number_of_articles):
+        # vectorize current article, paragraph per matrix row
         x_article = vectorizer.transform(articles[i]['paragraphs'])
         y_dec_article = classifier.decision_function(x_article)
+
+        # set all the topics which were not in the original article to 0
         y_article = inversed_topics[i] * y_dec_article
 
         x_list.append(x_article)
@@ -40,6 +44,7 @@ if __name__ == '__main__':
     vectorizer, classifier, corpus, topics, inversed_topics = None, None, None, None, None
 
     print("Building training matrices")
+    # create one matrix from the list of matrices
     x = sp.sparse.vstack(x_list, format='csr')
     x_list = None
 
