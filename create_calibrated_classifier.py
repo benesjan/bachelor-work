@@ -10,7 +10,7 @@ if __name__ == '__main__':
     binarizer = load_pickle(config.topic_binarizer_path)
 
     calibrated_classifier_one_class = CalibratedClassifierCV(LinearSVC(), cv=3)
-    calibrated_classifier = OneVsRestClassifier(calibrated_classifier_one_class, n_jobs=4)
+    calibrated_classifier = OneVsRestClassifier(calibrated_classifier_one_class, n_jobs=1)
 
     corpus, topics = build_corpus_and_topics(config.training_data_path)
 
