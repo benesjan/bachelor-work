@@ -1,6 +1,6 @@
 # coding: utf-8
 import numpy as np
-from matplotlib import pyplot
+from matplotlib import pyplot, rc
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
 from custom_imports import config
@@ -39,9 +39,11 @@ if __name__ == '__main__':
 
         print('threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
 
+    rc('font', family='Arial')
     pyplot.plot(values[:, 0], values[:, 1:4])
     pyplot.legend(['F-measure', 'Precision', 'Recall'])
 
-    pyplot.title('Hledání optimálního prahu')
+    pyplot.title('Vývoj přesnosti, úplnosti a F-míry v závislosti na prahu')
     pyplot.xlabel('Práh')
+
     pyplot.show()
