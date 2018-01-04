@@ -13,8 +13,8 @@ def separate_data(source_file_path, held_out_path, training_data_path, nth_artic
     articles_processed = 0
 
     with open(source_file_path, 'r', encoding='utf-8') as source, \
-            open(held_out_path, 'a', encoding='utf-8') as held_out, \
-            open(training_data_path, 'a', encoding='utf-8') as training:
+            open(held_out_path, 'w', encoding='utf-8') as held_out, \
+            open(training_data_path, 'w', encoding='utf-8') as training:
         for line in source:
             if line.startswith('<article') and articles_processed % nth_article == 0:
                 append_training = False
