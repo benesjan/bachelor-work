@@ -12,6 +12,5 @@ data_vectorizer_path = data_directory + '/vectorizer.pickle'
 topic_binarizer_path = data_directory + '/binarizer.pickle'
 
 classifier_path = data_directory + '/classifier.pickle'
-classifier_paragraphs_path = data_directory + '/classifier_paragraphs.pickle'
 
-calibrated_classifier_path = data_directory + '/calibrated_classifier.pickle'
+classifier_paragraphs_path = data_directory + '/classifier_paragraphs.pickle'

@@ -5,6 +5,8 @@ from sklearn.svm import LinearSVC
 from custom_imports import config
 from custom_imports.utils import build_topics_and_paragraphs, load_pickle, r_cut, save_pickle
 
+# TODO: adjust for calibrated classifier
+
 if __name__ == '__main__':
     classifier = load_pickle(config.classifier_path)
     vectorizer = load_pickle(config.data_vectorizer_path)

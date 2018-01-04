@@ -105,13 +105,3 @@ def save_pickle(file_path, object_to_save):
 def load_pickle(file_path):
     with open(file_path, 'rb') as handle:
         return pickle.load(handle)
-
-
-def yes_or_no(question):
-    while True:
-        reply = str(input(question + ' (y/n): ')).lower().strip()
-        if reply[0] == 'y':
-            return True
-        if reply[0] == 'n':
-            return False
-        print("Incorrect input, please enter 'y' or 'n'")

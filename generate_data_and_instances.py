@@ -1,3 +1,4 @@
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
@@ -53,7 +54,9 @@ if __name__ == '__main__':
     print("Removing unnecessary variables from memory")
     vectorizer, binarizer, corpus, topics = None, None, None, None
 
-    classifier = OneVsRestClassifier(LinearSVC(), n_jobs=4)
+    classifier_one_class = CalibratedClassifierCV(LinearSVC(), cv=3)
+    classifier = OneVsRestClassifier(classifier_one_class, n_jobs=1)
+
     print("Training the classifier")
     classifier.fit(X, Y)
 
