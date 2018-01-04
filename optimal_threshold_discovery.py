@@ -30,6 +30,8 @@ if __name__ == '__main__':
 
     values = np.ones((threshold_array.shape[0], 4), dtype=np.float)
 
+    optimal_position = [-100, 0, 0, 0]
+
     for i, T in enumerate(threshold_array):
         # Returns matrix where each elements is set to True if the element's value is bigger than threshold
         y_pred_T = y_pred > T
@@ -41,9 +43,20 @@ if __name__ == '__main__':
 
         print('threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
 
+        if F > optimal_position[1]:
+            optimal_position = values[i, :]
+
     rc('font', family='Arial')
     pyplot.plot(values[:, 0], values[:, 1:4])
     pyplot.legend(['F-measure', 'Precision', 'Recall'])
+
+    pyplot.grid()
+    pyplot.scatter(optimal_position[0], optimal_position[1], marker="x", s=300, linewidth=3.3)
+    pyplot.annotate('[%.2f, %.2f]' % (optimal_position[0], optimal_position[1]),
+                    [optimal_position[0], optimal_position[1] - 0.055])
+
+    pyplot.xlim([0, 1])
+    pyplot.ylim([0, 1])
 
     pyplot.title('Vývoj přesnosti, úplnosti a F-míry v závislosti na prahu')
     pyplot.xlabel('Práh')
