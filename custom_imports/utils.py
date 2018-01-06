@@ -1,6 +1,7 @@
 # coding: utf-8
 import pickle
 import numpy as np
+from scipy.sparse import csr_matrix
 
 from re import match
 
@@ -105,3 +106,14 @@ def save_pickle(file_path, object_to_save):
 def load_pickle(file_path):
     with open(file_path, 'rb') as handle:
         return pickle.load(handle)
+
+
+def save_sparse_csr(filename, array):
+    np.savez(filename, data=array.data, indices=array.indices,
+             indptr=array.indptr, shape=array.shape)
+
+
+def load_sparse_csr(filename):
+    loader = np.load(filename)
+    return csr_matrix((loader['data'], loader['indices'], loader['indptr']),
+                      shape=loader['shape'])
