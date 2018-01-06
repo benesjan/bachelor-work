@@ -48,7 +48,7 @@ if __name__ == '__main__':
     vectorizer = load_pickle(config.data_vectorizer_path)
     binarizer = load_pickle(config.topic_binarizer_path)
 
-    articles, topics, article_map = build_topics_paragraphs_index_map(config.training_data_raw_path)
+    articles, topics, article_map = build_topics_paragraphs_index_map(config.training_data_path)
     y_true = binarizer.transform(topics)
 
     print("Building the data matrix using the TfidfVectorizer")
