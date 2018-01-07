@@ -4,7 +4,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
 
 from custom_imports import config
-from custom_imports.utils import load_pickle, load_sparse_csr, save_pickle
+from custom_imports.utils import load_pickle, load_sparse_csr, save_pickle, choose_option
 
 
 def threshold_half_max(y):
@@ -18,6 +18,38 @@ def threshold_half_max(y):
 
     for i in range(max_indices.shape[0]):
         y[i, :] = y[i, :] > threshold_array[i]
+
+    return y
+
+
+def threshold_biggest_gap(y):
+    """
+    This method finds the biggest gap between sorted predictions and uses position of this gap as threshold.
+    :param y: predictions to threshold
+    :return: processed predictions
+    """
+    y_sorted = -np.sort(-y, axis=1)
+
+    for i in range(y.shape[0]):
+        biggest_gap = 0
+        gap_index = -1
+        for j in range(y.shape[1] - 1):
+            gap = y_sorted[i, j] - y_sorted[i, j + 1]
+            if gap > biggest_gap:
+                biggest_gap = gap
+                gap_index = j
+
+            # If the element is smaller than the biggest gap then there can't be bigger gap found in the row
+            if biggest_gap > y[i, j + 1]:
+                break
+
+        assert biggest_gap != 0 and gap_index != -1, "Variables not set"
+
+        # Probability between the 2 furthest probabilities is set as threshold
+        threshold = (y_sorted[i, gap_index] + y_sorted[i, gap_index + 1]) / 2
+
+        # Apply the threshold to row
+        y[i, :] = y[i, :] > threshold
 
     return y
 
@@ -57,7 +89,15 @@ def process_y(data, func):
 if __name__ == '__main__':
     data = config.get_par_data('train')
 
-    y = process_y(data, threshold_half_max)
+    if choose_option('Do you want to use biggest gap thresholding mechanism [b]' +
+                     ' or half the biggest probability as threshold [h]?', 'b', 'h'):
+        threshold_func = threshold_biggest_gap
+        classifier_path = config.classifier_par_biggest_gap
+    else:
+        threshold_func = threshold_half_max
+        classifier_path = config.classifier_par_half_max
+
+    y = process_y(data, threshold_func)
 
     # Check if every topic was used at least once
     if 0 in np.sum(y, axis=0):
@@ -73,4 +113,4 @@ if __name__ == '__main__':
     classifier.fit(x, y)
 
     print("Saving the classifier to file")
-    save_pickle(config.classifier_par, classifier)
+    save_pickle(classifier_path, classifier)

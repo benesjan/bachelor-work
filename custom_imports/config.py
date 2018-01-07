@@ -32,4 +32,5 @@ def get_par_data(data_name):
     }
 
 
-classifier_par = par_data_dir + '/classifier_par.pickle'
+classifier_par_half_max = par_data_dir + '/classifier_par_half_max.pickle'
+classifier_par_biggest_gap = par_data_dir + '/classifier_par_biggest_gap.pickle'

@@ -26,7 +26,7 @@ if __name__ == '__main__':
         data = config.get_par_data('test')
 
         print('Loading the paragraph trained classifier')
-        classifier = load_pickle(config.classifier_par)
+        classifier = load_pickle(config.classifier_par_half_max)
 
         y_true = process_y(data, threshold_half_max)
 
