@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot, rc
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
-from create_classifier_paragraphs import threshold_half_max, threshold_y
+from create_classifier_paragraphs import threshold_half_max, process_y
 from custom_imports import config
 from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, choose_option
 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
         print('Loading the paragraph trained classifier')
         classifier = load_pickle(config.classifier_par)
 
-        y_true = threshold_y(data, threshold_half_max)
+        y_true = process_y(data, threshold_half_max)
 
         print("Loading x")
         x = load_sparse_csr(data['x'])

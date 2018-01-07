@@ -32,7 +32,13 @@ def get_next(line_map):
             yield line_map[j], line_map[j + 1], j / 2
 
 
-def threshold_y(data, func):
+def process_y(data, func):
+    """
+    This  method removes the topic predictions which were not in the full article from paragraph predictions
+    :param data: paths to data
+    :param func: a function that will be applied to paragraphs
+    :return: y from which non article topics were removed and to which threshold function was applied
+    """
     print("Loading the data")
     y = np.load(data['y'])
     y_true = np.load(data['y_true'])
@@ -51,7 +57,7 @@ def threshold_y(data, func):
 if __name__ == '__main__':
     data = config.get_par_data('train')
 
-    y = threshold_y(data, threshold_half_max)
+    y = process_y(data, threshold_half_max)
 
     # Check if every topic was used at least once
     if 0 in np.sum(y, axis=0):

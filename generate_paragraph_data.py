@@ -1,5 +1,4 @@
 from re import match
-
 import numpy as np
 
 from custom_imports import config
