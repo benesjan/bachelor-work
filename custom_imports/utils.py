@@ -1,6 +1,7 @@
 # coding: utf-8
 import pickle
 import numpy as np
+from pathlib import Path
 from scipy.sparse import csr_matrix
 
 from re import match
@@ -117,3 +118,7 @@ def load_sparse_csr(filename):
     loader = np.load(filename)
     return csr_matrix((loader['data'], loader['indices'], loader['indptr']),
                       shape=loader['shape'])
+
+
+def create_dir(path):
+    Path(path).mkdir(parents=True, exist_ok=True)

@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print('Loading the classifier')
     classifier = load_pickle(config.classifier)
 
-    corpus, topics = build_corpus_and_topics(config.test_data)
+    corpus, topics = build_corpus_and_topics(config.data['test'])
 
     print('Transforming corpus by vectorizer')
     x = vectorizer.transform(corpus)

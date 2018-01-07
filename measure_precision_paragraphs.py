@@ -18,7 +18,7 @@ if __name__ == '__main__':
     vectorizer = load_pickle(config.vectorizer)
     binarizer = load_pickle(config.binarizer)
 
-    articles, topics = build_topics_and_paragraphs(config.test_data)
+    articles, topics = build_topics_and_paragraphs(config.data['test'])
     print("Creating paragraph based predictions")
 
     article_topics = []

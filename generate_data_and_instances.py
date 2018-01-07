@@ -35,9 +35,9 @@ if __name__ == '__main__':
     binarizer = MultiLabelBinarizer()
 
     print("Separating held-out from training data")
-    separate_data(config.train_data_raw, config.held_out_data, config.train_data)
+    separate_data(config.train_data_raw, config.data['held_out'], config.data['train'])
 
-    corpus, topics = build_corpus_and_topics(config.train_data)
+    corpus, topics = build_corpus_and_topics(config.data['train'])
 
     print("Building the data matrix using the TfidfVectorizer")
     X = vectorizer.fit_transform(corpus)

@@ -13,7 +13,7 @@ if __name__ == '__main__':
     print('Loading calibrated classifier')
     classifier = load_pickle(config.classifier)
 
-    corpus, topics = build_corpus_and_topics(config.held_out_data)
+    corpus, topics = build_corpus_and_topics(config.data['held_out'])
 
     print("Transforming corpus by vectorizer")
     x = vectorizer.transform(corpus)

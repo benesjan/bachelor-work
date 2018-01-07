@@ -3,7 +3,7 @@ from re import match
 import numpy as np
 
 from custom_imports import config
-from custom_imports.utils import load_pickle, save_pickle, save_sparse_csr
+from custom_imports.utils import load_pickle, save_pickle, save_sparse_csr, create_dir
 
 
 def build_topics_paragraphs_index_map(raw_data_file_path, n_articles=-1):
@@ -31,34 +31,45 @@ def build_topics_paragraphs_index_map(raw_data_file_path, n_articles=-1):
                     # First line of article
                     topics.append(match_obj.group(2).split(' '))
                     articles_processed += 1
-                    print(str(articles_processed) + ". article loaded")
+                    print(str(articles_processed) + '. article loaded')
                     continue
 
             paragraph_index += 1
             articles.append(line)
 
     if len(line_map) != (len(topics) * 2):
-        raise ValueError("Error: matrix dimensions do not match")
+        raise ValueError('Error: matrix dimensions do not match')
 
     return articles, topics, line_map
 
 
+def get_next_data(data_names):
+    for name in data_names:
+        yield config.get_par_data(name)
+
+
 if __name__ == '__main__':
+    print('Loading the instances')
     classifier = load_pickle(config.classifier)
     vectorizer = load_pickle(config.vectorizer)
     binarizer = load_pickle(config.binarizer)
 
-    articles, topics, line_map = build_topics_paragraphs_index_map(config.train_data)
-    y_true = binarizer.transform(topics)
+    for data in get_next_data(config.data.keys()):
+        print('Processing ' + data['name'] + ' data')
 
-    print("Building the data matrix using the TfidfVectorizer")
-    x = vectorizer.transform(articles)
+        create_dir(data['dir'])
 
-    print("Classifying...")
-    y_pred = classifier.predict_proba(x)
+        articles, topics, line_map = build_topics_paragraphs_index_map(data['text'])
+        y_true = binarizer.transform(topics)
 
-    print("Saving the data")
-    np.save(config.y_par, y_pred)
-    np.save(config.y_par_true, y_true)
-    save_sparse_csr(config.x_par, x)
-    save_pickle(config.line_map, line_map)
+        print('Building the data matrix using the TfidfVectorizer')
+        x = vectorizer.transform(articles)
+
+        print('Classifying...')
+        y = classifier.predict_proba(x)
+
+        print('Saving the data')
+        save_sparse_csr(data['x'], x)
+        np.save(data['y'], y)
+        np.save(data['y_true'], y_true)
+        save_pickle(data['line_map'], line_map)
