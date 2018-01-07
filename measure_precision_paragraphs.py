@@ -14,11 +14,11 @@ def compute_weights(article):
 
 
 if __name__ == '__main__':
-    classifier = load_pickle(config.classifier_paragraphs_path)
-    vectorizer = load_pickle(config.data_vectorizer_path)
-    binarizer = load_pickle(config.topic_binarizer_path)
+    classifier = load_pickle(config.classifier_par)
+    vectorizer = load_pickle(config.vectorizer)
+    binarizer = load_pickle(config.binarizer)
 
-    articles, topics = build_topics_and_paragraphs(config.testing_data_path)
+    articles, topics = build_topics_and_paragraphs(config.test_data)
     print("Creating paragraph based predictions")
 
     article_topics = []

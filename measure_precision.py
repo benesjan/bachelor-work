@@ -19,13 +19,13 @@ def predict_tuned(x, classifier):
 
 
 if __name__ == '__main__':
-    vectorizer = load_pickle(config.data_vectorizer_path)
-    binarizer = load_pickle(config.topic_binarizer_path)
+    vectorizer = load_pickle(config.vectorizer)
+    binarizer = load_pickle(config.binarizer)
 
     print('Loading the classifier')
-    classifier = load_pickle(config.classifier_path)
+    classifier = load_pickle(config.classifier)
 
-    corpus, topics = build_corpus_and_topics(config.testing_data_path)
+    corpus, topics = build_corpus_and_topics(config.test_data)
 
     print('Transforming corpus by vectorizer')
     x = vectorizer.transform(corpus)

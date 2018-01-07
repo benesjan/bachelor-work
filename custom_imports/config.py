@@ -1,21 +1,32 @@
 # coding: utf-8
-data_directory = './data'
+data_dir = './data'
 
 # Raw data
-training_data_raw_path = data_directory + '/CNO_IPTC_train.txt'
-testing_data_path = data_directory + '/CNO_IPTC_test.txt'
+train_data_raw = data_dir + '/CNO_IPTC_train.txt'
 
-training_data_path = data_directory + '/training.txt'
-held_out_data_path = data_directory + '/held_out.txt'
+train_data = data_dir + '/train.txt'
+held_out_data = data_dir + '/held_out.txt'
+test_data = data_dir + '/CNO_IPTC_test.txt'
 
-data_vectorizer_path = data_directory + '/vectorizer.pickle'
-topic_binarizer_path = data_directory + '/binarizer.pickle'
+vectorizer = data_dir + '/vectorizer.pickle'
+binarizer = data_dir + '/binarizer.pickle'
+classifier = data_dir + '/classifier.pickle'
 
-classifier_path = data_directory + '/classifier.pickle'
+# Paragraph classifier data
+data_names = ['train', 'held_out', 'test']
 
-y_paragraphs = data_directory + '/y_paragraphs.npy'
-y_paragraphs_true = data_directory + '/y_paragraphs_true.npy'
-x_paragraphs = data_directory + '/x_paragraphs.npz'
-article_paragraph_map = data_directory + '/article_paragraph_map.pickle'
+par_data_dir = data_dir + '/paragraphs'
 
-classifier_paragraphs_path = data_directory + '/classifier_paragraphs.pickle'
+
+def get_par_data(data_name):
+    assert data_name in data_names, "Invalid data name"
+    recent_dir = par_data_dir + '/' + data_name + '/'
+    return {
+        'x': recent_dir + 'x.npz',
+        'y': recent_dir + 'y.npy',
+        'y_true': recent_dir + 'y_true.npy',
+        'line_map': recent_dir + 'line_map.pickle'
+    }
+
+
+classifier_par = par_data_dir + '/classifier_par.pickle'

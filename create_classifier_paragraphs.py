@@ -22,24 +22,24 @@ def threshold_half_max(y):
     return y
 
 
-def get_next(article_map_):
+def get_next(line_map):
     """
-    :param article_map_: a list with indexes of beginnings and ends of articles
+    :param line_map: a list with indexes of beginnings and ends of articles
     :return: first line index, last line index and the index of article
     """
-    for j in range(len(article_map_)):
+    for j in range(len(line_map)):
         if j % 2 == 0:
-            yield article_map_[j], article_map_[j + 1], j / 2
+            yield line_map[j], line_map[j + 1], j / 2
 
 
 if __name__ == '__main__':
     print("Loading the data")
-    y = np.load(config.y_paragraphs)
-    y_true = np.load(config.y_paragraphs_true)
-    article_map = load_pickle(config.article_paragraph_map)
+    y = np.load(config.y_par)
+    y_true = np.load(config.y_par_true)
+    line_map = load_pickle(config.line_map)
 
     print("Processing the predictions")
-    for line_start, line_end, article_index in get_next(article_map):
+    for line_start, line_end, article_index in get_next(line_map):
         # set all the topics which were not in the original article to 0
         y_article = \
             y_true[article_index] * y[line_start:line_end, :]
@@ -51,7 +51,7 @@ if __name__ == '__main__':
         print("WARNING: not all topics used")
 
     print("Loading x")
-    x = load_sparse_csr(config.x_paragraphs)
+    x = load_sparse_csr(config.x_par)
 
     classifier_one_class = CalibratedClassifierCV(LinearSVC(), cv=3)
     classifier = OneVsRestClassifier(classifier_one_class, n_jobs=1)
@@ -60,4 +60,4 @@ if __name__ == '__main__':
     classifier.fit(x, y)
 
     print("Saving the classifier to file")
-    save_pickle(config.classifier_paragraphs_path, classifier)
+    save_pickle(config.classifier_par, classifier)

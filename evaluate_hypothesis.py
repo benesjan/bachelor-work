@@ -4,11 +4,11 @@ from custom_imports.classifier_functions import predict_tuned, classifier
 from custom_imports.utils import load_pickle, build_topics_and_paragraphs
 
 if __name__ == '__main__':
-    vectorizer = load_pickle(config.data_vectorizer_path)
-    binarizer = load_pickle(config.topic_binarizer_path)
+    vectorizer = load_pickle(config.vectorizer)
+    binarizer = load_pickle(config.binarizer)
 
-    corpus, topics = build_corpus_and_topics(config.held_out_data_path)
-    corpus_paragraphs, topics_ = build_topics_and_paragraphs(config.held_out_data_path)
+    corpus, topics = build_corpus_and_topics(config.held_out_data)
+    corpus_paragraphs, topics_ = build_topics_and_paragraphs(config.held_out_data)
 
     x = vectorizer.transform(corpus)
     y = classifier.predict(x)

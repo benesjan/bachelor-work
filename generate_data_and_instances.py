@@ -35,9 +35,9 @@ if __name__ == '__main__':
     binarizer = MultiLabelBinarizer()
 
     print("Separating held-out from training data")
-    separate_data(config.training_data_raw_path, config.held_out_data_path, config.training_data_path)
+    separate_data(config.train_data_raw, config.held_out_data, config.train_data)
 
-    corpus, topics = build_corpus_and_topics(config.training_data_path)
+    corpus, topics = build_corpus_and_topics(config.train_data)
 
     print("Building the data matrix using the TfidfVectorizer")
     X = vectorizer.fit_transform(corpus)
@@ -46,10 +46,10 @@ if __name__ == '__main__':
     Y = binarizer.fit_transform(topics)
 
     print("Saving the vectorizer to file")
-    save_pickle(config.data_vectorizer_path, vectorizer)
+    save_pickle(config.vectorizer, vectorizer)
 
     print("Saving the binarizer to file")
-    save_pickle(config.topic_binarizer_path, binarizer)
+    save_pickle(config.binarizer, binarizer)
 
     print("Removing unnecessary variables from memory")
     vectorizer, binarizer, corpus, topics = None, None, None, None
@@ -61,4 +61,4 @@ if __name__ == '__main__':
     classifier.fit(X, Y)
 
     print("Saving the classifier to file")
-    save_pickle(config.classifier_path, classifier)
+    save_pickle(config.classifier, classifier)
