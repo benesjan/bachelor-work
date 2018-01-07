@@ -32,26 +32,33 @@ def get_next(line_map):
             yield line_map[j], line_map[j + 1], j / 2
 
 
-if __name__ == '__main__':
+def threshold_y(data, func):
     print("Loading the data")
-    y = np.load(config.y_par)
-    y_true = np.load(config.y_par_true)
-    line_map = load_pickle(config.line_map)
+    y = np.load(data['y'])
+    y_true = np.load(data['y_true'])
+    line_map = load_pickle(data['line_map'])
 
     print("Processing the predictions")
     for line_start, line_end, article_index in get_next(line_map):
         # set all the topics which were not in the original article to 0
-        y_article = \
-            y_true[article_index] * y[line_start:line_end, :]
+        y_article = y_true[article_index] * y[line_start:line_end, :]
 
-        y[line_start:line_end, :] = threshold_half_max(y_article)
+        y[line_start:line_end, :] = func(y_article)
+
+    return y
+
+
+if __name__ == '__main__':
+    data = config.get_par_data('train')
+
+    y = threshold_y(data, threshold_half_max)
 
     # Check if every topic was used at least once
     if 0 in np.sum(y, axis=0):
         print("WARNING: not all topics used")
 
     print("Loading x")
-    x = load_sparse_csr(config.x_par)
+    x = load_sparse_csr(data['x'])
 
     classifier_one_class = CalibratedClassifierCV(LinearSVC(), cv=3)
     classifier = OneVsRestClassifier(classifier_one_class, n_jobs=1)

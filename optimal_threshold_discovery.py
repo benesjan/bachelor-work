@@ -3,22 +3,35 @@ import numpy as np
 from matplotlib import pyplot, rc
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
+from create_classifier_paragraphs import threshold_half_max, threshold_y
 from custom_imports import config
-from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut
+from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, choose_option
 
 if __name__ == '__main__':
-    vectorizer = load_pickle(config.vectorizer)
-    binarizer = load_pickle(config.binarizer)
 
-    print('Loading calibrated classifier')
-    classifier = load_pickle(config.classifier)
+    if choose_option('Do you want to use paragraphs trained classifier or the  article trained version?', 'p', 'a'):
+        data = config.get_par_data('held_out')
 
-    corpus, topics = build_corpus_and_topics(config.data['held_out'])
+        print('Loading the paragraph trained classifier')
+        classifier = load_pickle(config.classifier_par)
 
-    print("Transforming corpus by vectorizer")
-    x = vectorizer.transform(corpus)
-    print("Transforming article topics by binarizer")
-    y_true = binarizer.transform(topics)
+        y_true = threshold_y(data, threshold_half_max)
+
+        print("Loading x")
+        x = load_sparse_csr(data['x'])
+    else:
+        print('Loading the full article trained classifier')
+        vectorizer = load_pickle(config.vectorizer)
+        binarizer = load_pickle(config.binarizer)
+
+        classifier = load_pickle(config.classifier)
+
+        corpus, topics = build_corpus_and_topics(config.data['held_out'])
+
+        print("Transforming corpus by vectorizer")
+        x = vectorizer.transform(corpus)
+        print("Transforming article topics by binarizer")
+        y_true = binarizer.transform(topics)
 
     print("Classifying the data")
     y_pred = classifier.predict_proba(x)
@@ -33,10 +46,7 @@ if __name__ == '__main__':
     optimal_position = [-100, 0, 0, 0]
 
     for i, T in enumerate(threshold_array):
-        # Returns matrix where each elements is set to True if the element's value is bigger than threshold
-        y_pred_T = y_pred > T
-
-        y_classifier = y_pred_min_topics + y_pred_T
+        y_classifier = y_pred_min_topics + (y_pred > T)
 
         P, R, F, S = prfs(y_true, y_classifier, average="samples")
         values[i, :] = [T, F, P, R]

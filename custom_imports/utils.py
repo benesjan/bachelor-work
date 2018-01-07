@@ -122,3 +122,13 @@ def load_sparse_csr(filename):
 
 def create_dir(path):
     Path(path).mkdir(parents=True, exist_ok=True)
+
+
+def choose_option(question, first, second):
+    while True:
+        reply = str(input(question + ' ({0}/{1}): '.format(first, second))).lower().strip()
+        if reply[0] == first:
+            return True
+        if reply[0] == second:
+            return False
+        print("Incorrect input, please enter '{0}' or '{1}'".format(first, second))
