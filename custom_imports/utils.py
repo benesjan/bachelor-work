@@ -86,7 +86,7 @@ def create_dir(path):
     Path(path).mkdir(parents=True, exist_ok=True)
 
 
-def choose_option(question, first, second):
+def first_option(question, first, second):
     while True:
         reply = str(input(question + ' ({0}/{1}): '.format(first, second))).lower().strip()
         if reply[0] == first:

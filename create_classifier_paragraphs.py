@@ -4,7 +4,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
 
 from custom_imports import config
-from custom_imports.utils import load_pickle, load_sparse_csr, save_pickle, choose_option
+from custom_imports.utils import load_pickle, load_sparse_csr, save_pickle, first_option
 
 
 def threshold_half_max(y):
@@ -89,8 +89,8 @@ def process_y(data, func):
 if __name__ == '__main__':
     data = config.get_par_data('train')
 
-    if choose_option('Do you want to use biggest gap thresholding mechanism [b]' +
-                     ' or half the biggest probability as threshold [h]?', 'b', 'h'):
+    if first_option('Do you want to use the biggest gap thresholding mechanism [b]'
+                    ' or half the biggest probability as threshold [h]?', 'b', 'h'):
         threshold_func = threshold_biggest_gap
         classifier_path = config.classifier_par_biggest_gap
     else:

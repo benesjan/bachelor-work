@@ -5,15 +5,22 @@ from sklearn.metrics import precision_recall_fscore_support as prfs
 
 from create_classifier_paragraphs import threshold_half_max, process_y
 from custom_imports import config
-from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, choose_option
+from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, first_option
 
 if __name__ == '__main__':
 
-    if choose_option('Do you want to use paragraphs trained classifier or the  article trained version?', 'p', 'a'):
+    if first_option('Do you want to use paragraphs trained classifier or the article trained version?', 'p', 'a'):
         data = config.get_par_data('held_out')
 
-        print('Loading the paragraph trained classifier')
-        classifier = load_pickle(config.classifier_par_half_max)
+        if first_option('Do you want to use the biggest gap thresholding mechanism [b]'
+                        ' or half the biggest probability as threshold [h]?', 'b', 'h'):
+            print('Loading the paragraph trained classifier trained on data processed by'
+                  'biggest gap thresholding mechanism ')
+            classifier = load_pickle(config.classifier_par_biggest_gap)
+        else:
+            print('Loading the paragraph trained classifier trained on data processed by'
+                  ' threshold_half_max function')
+            classifier = load_pickle(config.classifier_par_half_max)
 
         y_true = process_y(data, threshold_half_max)
 
