@@ -1,7 +1,7 @@
 # coding: utf-8
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
-from create_classifier_paragraphs import process_y, threshold_half_max
+from create_classifier_paragraphs import process_y, threshold_half_max, threshold_biggest_gap
 from custom_imports import config
 from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut, first_option, load_sparse_csr
 
@@ -20,7 +20,8 @@ def predict_tuned(x, classifier, threshold):
 
 
 if __name__ == '__main__':
-    if first_option('Do you want to use paragraphs trained classifier or the  article trained version?', 'p', 'a'):
+    if first_option('Do you want to use paragraphs trained classifier [p] or the article trained version? [a]',
+                    'p', 'a'):
         data = config.get_par_data('test')
 
         if first_option('Do you want to use the biggest gap thresholding mechanism [b]'
@@ -28,14 +29,14 @@ if __name__ == '__main__':
             print('Loading the paragraph trained classifier trained on data processed by '
                   'biggest gap thresholding mechanism ')
             classifier = load_pickle(config.classifier_par_biggest_gap)
-            threshold = 0.1
+            threshold = 0.91
+            y_true = process_y(data, threshold_biggest_gap)
         else:
             print('Loading the paragraph trained classifier trained on data processed by'
                   ' threshold_half_max function')
             classifier = load_pickle(config.classifier_par_half_max)
             threshold = 0.39
-
-        y_true = process_y(data, threshold_half_max)
+            y_true = process_y(data, threshold_half_max)
 
         print("Loading x")
         x = load_sparse_csr(data['x'])
@@ -54,6 +55,7 @@ if __name__ == '__main__':
         x = vectorizer.transform(corpus)
         print('Transforming article topics by binarizer')
         y_true = binarizer.transform(topics)
+        del vectorizer, binarizer, corpus, topics
 
     y_pred = predict_tuned(x, classifier, threshold)
 

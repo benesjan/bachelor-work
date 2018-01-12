@@ -52,7 +52,7 @@ if __name__ == '__main__':
     save_pickle(config.binarizer, binarizer)
 
     print("Removing unnecessary variables from memory")
-    vectorizer, binarizer, corpus, topics = None, None, None, None
+    del vectorizer, binarizer, corpus, topics
 
     classifier_one_class = CalibratedClassifierCV(LinearSVC(), cv=3)
     classifier = OneVsRestClassifier(classifier_one_class, n_jobs=1)
