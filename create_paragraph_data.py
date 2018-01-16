@@ -5,13 +5,13 @@ from custom_imports import config
 from custom_imports.utils import load_pickle, save_pickle, save_sparse_csr, create_dir
 
 
-def build_topics_paragraphs_index_map(raw_data_file_path, n_articles=-1):
+def build_topics_paragraphs_index_map(data_path, n_articles=-1):
     pattern = r'<article id="([0-9]+)" topics="(.*)">'
 
     articles, topics, line_map = [], [], []
     articles_processed, paragraph_index = 0, 0
 
-    with open(raw_data_file_path, 'r', encoding='utf-8') as handler:
+    with open(data_path, 'r', encoding='utf-8') as handler:
         for line in handler:
             if line.startswith('<'):
                 if line == '</article>\n':

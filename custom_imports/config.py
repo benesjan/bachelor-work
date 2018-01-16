@@ -34,3 +34,18 @@ def get_par_data(data_name):
 
 classifier_par_half_max = par_data_dir + '/classifier_par_half_max.pickle'
 classifier_par_biggest_gap = par_data_dir + '/classifier_par_biggest_gap.pickle'
+
+# Text segmentation data
+seg_data_dir = data_dir + '/segmentation'
+
+
+def get_seg_data(data_name):
+    assert data_name in data.keys(), "Invalid data name"
+    recent_dir = seg_data_dir + '/' + data_name + '/'
+    return {
+        'dir': recent_dir,
+        'name': data_name,
+        'text': data[data_name],
+        'x': recent_dir + 'x.npz',
+        'line_map': recent_dir + 'line_map.pickle'
+    }
