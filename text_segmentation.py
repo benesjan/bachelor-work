@@ -64,8 +64,6 @@ if __name__ == '__main__':
 
     y_norms = compute_norm(y)
 
-    plot_thresholds(y_true, y_norms)
-
     window_size = 4
 
     y_pred = np.zeros((y_norms.shape[0], 1))
