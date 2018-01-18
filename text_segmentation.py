@@ -70,3 +70,11 @@ if __name__ == '__main__':
     y_true = line_map_to_y(line_map, y.shape[0] - 1)
 
     plot_thresholds(y_true, y_norms)
+
+    window_size = 4
+
+    y_pred = np.zeros((y_norms.shape[0], 1))
+    for i in range(window_size, y_norms.shape[0]):
+        y_pred[i] = np.abs(np.mean(y_norms[i - window_size:i]) - y_norms[i])
+
+    plot_thresholds(y_true, y_pred)
