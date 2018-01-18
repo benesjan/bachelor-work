@@ -21,19 +21,7 @@ def line_map_to_y(lines, dim):
     return y_
 
 
-if __name__ == '__main__':
-    data = config.get_par_data('held_out')
-
-    print("Loading the data")
-    x = load_sparse_csr(data['x'])
-    y = np.load(data['y'])
-    line_map = load_pickle(data['line_map'])
-
-    y_norms = compute_norm(y)
-
-    y_true = line_map_to_y(line_map, y.shape[0] - 1)
-
-    # Chart plotting
+def plot_thresholds(y_true, y_raw):
     threshold_array = np.arange(0, 1.0, 0.01)
 
     values = np.ones((threshold_array.shape[0], 4), dtype=np.float)
@@ -41,7 +29,7 @@ if __name__ == '__main__':
     optimal_position = [-100, 0, 0, 0]
 
     for i, T in enumerate(threshold_array):
-        y_pred = y_norms > T
+        y_pred = y_raw > T
 
         P, R, F, S = prfs(y_true, y_pred, average='binary')
         values[i, :] = [T, F, P, R]
@@ -67,3 +55,18 @@ if __name__ == '__main__':
     pyplot.xlabel('Práh')
 
     pyplot.show()
+
+
+if __name__ == '__main__':
+    data = config.get_par_data('held_out')
+
+    print("Loading the data")
+    x = load_sparse_csr(data['x'])
+    y = np.load(data['y'])
+    line_map = load_pickle(data['line_map'])
+
+    y_norms = compute_norm(y)
+
+    y_true = line_map_to_y(line_map, y.shape[0] - 1)
+
+    plot_thresholds(y_true, y_norms)
