@@ -1,24 +1,21 @@
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import precision_recall_fscore_support as prfs
 from matplotlib import pyplot, rc
+from sklearn.metrics import precision_recall_fscore_support as prfs
+from sklearn.preprocessing import MinMaxScaler
 
 from custom_imports import config
-from custom_imports.utils import load_sparse_csr, load_pickle
+from custom_imports.utils import load_sparse_csr
 
 
 def compute_norm(y):
+    """
+    :param y: prediction matrix
+    :return: vector with euclidean norms of every 2 consecutive vectors within the prediction matrix
+    """
     y_n = np.zeros((y.shape[0] - 1, 1))
     for i in range(y.shape[0] - 1):
         y_n[i] = np.linalg.norm(y[i, :] - y[i + 1, :])
     return MinMaxScaler().fit_transform(y_n)
-
-
-def line_map_to_y(lines, dim):
-    y_ = np.zeros((dim, 1))
-    for i in range(1, len(lines) - 1, 2):
-        y_[lines[i] - 1] = 1
-    return y_
 
 
 def plot_thresholds(y_true, y_raw):
@@ -58,15 +55,13 @@ def plot_thresholds(y_true, y_raw):
 
 
 if __name__ == '__main__':
-    data = config.get_par_data('held_out')
+    data = config.get_seg_data('held_out')
 
     print("Loading the data")
     x = load_sparse_csr(data['x'])
     y = np.load(data['y'])
-    line_map = load_pickle(data['line_map'])
+    y_true = np.load(data['y_true'])
 
     y_norms = compute_norm(y)
-
-    y_true = line_map_to_y(line_map, y.shape[0] - 1)
 
     plot_thresholds(y_true, y_norms)

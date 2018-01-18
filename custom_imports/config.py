@@ -48,5 +48,5 @@ def get_seg_data(data_name):
         'text': data[data_name],
         'x': recent_dir + 'x.npz',
         'y': recent_dir + 'y.npy',
-        'line_map': recent_dir + 'line_map.pickle'
+        'y_true': recent_dir + 'y_true.npy'
     }
