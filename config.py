@@ -1,5 +1,7 @@
+import os
+
 # coding: utf-8
-data_dir = './data'
+data_dir = os.path.dirname(os.path.realpath(__file__)) + '/data'
 
 # Raw data
 train_data_raw = data_dir + '/CNO_IPTC_train.txt'

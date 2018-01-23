@@ -3,9 +3,9 @@ import numpy as np
 from matplotlib import pyplot, rc
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
-from create_classifier_paragraphs import threshold_half_max, process_y, threshold_biggest_gap
-from custom_imports import config
-from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, first_option
+from classification.create_classifier_paragraphs import threshold_half_max, process_y, threshold_biggest_gap
+import config
+from utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, first_option
 
 
 def plot_thresholds(y_true, y_pred, ensure_topic=False, average_type='samples'):

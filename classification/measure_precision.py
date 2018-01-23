@@ -1,9 +1,9 @@
 # coding: utf-8
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
-from create_classifier_paragraphs import process_y, threshold_half_max, threshold_biggest_gap
-from custom_imports import config
-from custom_imports.utils import load_pickle, build_corpus_and_topics, r_cut, first_option, load_sparse_csr
+from classification.create_classifier_paragraphs import process_y, threshold_half_max, threshold_biggest_gap
+import config
+from utils import load_pickle, build_corpus_and_topics, r_cut, first_option, load_sparse_csr
 
 
 def predict_tuned(x, classifier, threshold):

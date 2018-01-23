@@ -3,8 +3,8 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
 
-from custom_imports import config
-from custom_imports.utils import load_pickle, load_sparse_csr, save_pickle, first_option
+import config
+from utils import load_pickle, load_sparse_csr, save_pickle, first_option
 
 
 def threshold_half_max(y):

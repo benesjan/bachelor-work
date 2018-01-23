@@ -2,9 +2,9 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import MinMaxScaler
 
-from custom_imports import config
-from custom_imports.utils import load_sparse_csr
-from optimal_threshold_discovery import plot_thresholds
+import config
+from classification.optimal_threshold_discovery import plot_thresholds
+from utils import load_sparse_csr
 
 
 def compute_euclidean_distance(y):

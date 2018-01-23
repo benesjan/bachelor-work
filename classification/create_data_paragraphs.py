@@ -1,8 +1,8 @@
 from re import match
 import numpy as np
 
-from custom_imports import config
-from custom_imports.utils import load_pickle, save_pickle, save_sparse_csr, create_dir
+import config
+from utils import load_pickle, save_pickle, save_sparse_csr, create_dir
 
 
 def build_topics_paragraphs_index_map(data_path, n_articles=-1):

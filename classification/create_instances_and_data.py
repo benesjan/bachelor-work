@@ -4,8 +4,8 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.svm import LinearSVC
 
-from custom_imports import config
-from custom_imports.utils import save_pickle, build_corpus_and_topics
+import config
+from utils import save_pickle, build_corpus_and_topics
 
 
 # Creates 2 files. One contains held-out data and the other one training data
