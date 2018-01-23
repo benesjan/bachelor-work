@@ -35,6 +35,21 @@ def compute_cosine_distance(y):
     return y_n
 
 
+def slide_window(y_n, window_size=4):
+    y_p = np.zeros((y_n.shape[0], 1))
+    for i in range(window_size, y_n.shape[0]):
+        y_p[i] = np.abs(np.mean(y_n[i - window_size:i]) - y_n[i])
+    return y_p
+
+
+def neighbourhood_difference(y_n, epsilon=2):
+    y_p = np.zeros((y_n.shape[0], 1))
+    for i in range(epsilon, y_n.shape[0] - epsilon):
+        avg = (np.sum(y_n[(i - epsilon): i]) + np.sum(y_n[i + 1: (i + 1 + epsilon)])) / (2 * epsilon)
+        y_p[i] = np.abs(avg - y_n[i])
+    return y_p
+
+
 if __name__ == '__main__':
     data = config.get_seg_data('held_out')
 
@@ -45,12 +60,14 @@ if __name__ == '__main__':
 
     # y_norms = compute_euclidean_distance(y)
     y_norms = compute_cosine_distance(y)
-    # plot_thresholds(y_true, y_norms, False, 'binary')
 
-    window_size = 4
+    # best result: threshold = 0.92, F1 = 0.708 (P = 0.709, R = 0.706)
+    y_pred = y_norms
 
-    y_pred = np.zeros((y_norms.shape[0], 1))
-    for i in range(window_size, y_norms.shape[0]):
-        y_pred[i] = np.abs(np.mean(y_norms[i - window_size:i]) - y_norms[i])
+    # best result: window = 4, threshold = 0.42, F1 = 0.419 (P = 0.339, R = 0.550)
+    # y_pred = slide_window(y_norms)
+
+    # best result: epsilon = 2, threshold = 0.46, F1 = 0.515 (P = 0.468, R = 0.573)
+    # y_pred = neighbourhood_difference(y_norms)
 
     plot_thresholds(y_true, y_pred, False, 'binary')
