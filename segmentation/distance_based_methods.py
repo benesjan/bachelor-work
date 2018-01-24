@@ -4,7 +4,6 @@ from sklearn.preprocessing import MinMaxScaler
 
 import config
 from classification.optimal_threshold_discovery import plot_thresholds
-from utils import load_sparse_csr
 
 
 def compute_euclidean_distance(y):
@@ -54,7 +53,6 @@ if __name__ == '__main__':
     data = config.get_seg_data('held_out')
 
     print("Loading the data")
-    x = load_sparse_csr(data['x'])
     y = np.load(data['y'])
     y_true = np.load(data['y_true'])
 
