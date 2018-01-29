@@ -52,3 +52,6 @@ def get_seg_data(data_name):
         'y': recent_dir + 'y.npy',
         'y_true': recent_dir + 'y_true.npy'
     }
+
+
+classifier_binary = seg_data_dir + '/classifier_binary.pickle'

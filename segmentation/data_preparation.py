@@ -12,7 +12,7 @@ def line_map_to_y(lines):
     """
     # dimension of y_ is the index of last article line -1 (-1 because there can be n-1 topic changes,
     # where n is number of rows in the prediction matrix)
-    dim = line_map[-1] - 1
+    dim = lines[-1] - 1
     y_ = np.zeros((dim, 1))
     for i in range(1, len(lines) - 1, 2):
         y_[lines[i] - 1] = 1
@@ -34,14 +34,14 @@ if __name__ == '__main__':
 
         create_dir(data['dir'])
 
-        articles, ignored, line_map = build_topics_paragraphs_index_map(data['text'])
+        paragraphs, ignored, line_map = build_topics_paragraphs_index_map(data['text'])
 
         y_true = line_map_to_y(line_map)
 
         print('Building the data matrix using the TfidfVectorizer')
-        x = vectorizer.transform(articles)
+        x = vectorizer.transform(paragraphs)
 
-        del articles, ignored, line_map
+        del paragraphs, ignored, line_map, vectorizer
 
         print('Classifying...')
         y = classifier.predict_proba(x)
