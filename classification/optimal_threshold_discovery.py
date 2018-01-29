@@ -8,8 +8,8 @@ import config
 from utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, first_option
 
 
-def plot_thresholds(y_true, y_pred, ensure_topic=False, average_type='samples'):
-    threshold_array = np.arange(0, 1.0, 0.01)
+def plot_thresholds(y_true, y_pred, ensure_topic=False, average_type='samples', calibrated=True):
+    threshold_array = np.arange(0 if calibrated else -1, 1.0, 0.01)
 
     values = np.ones((threshold_array.shape[0], 4), dtype=np.float)
 
@@ -41,7 +41,7 @@ def plot_thresholds(y_true, y_pred, ensure_topic=False, average_type='samples'):
     pyplot.annotate('[%.2f, %.2f]' % (optimal_position[0], optimal_position[1]),
                     [optimal_position[0], optimal_position[1] - 0.055])
 
-    pyplot.xlim([0, 1])
+    pyplot.xlim([0 if calibrated else -1, 1])
     pyplot.ylim([0, 1])
 
     pyplot.title('Vývoj přesnosti, úplnosti a F-míry v závislosti na prahu')
