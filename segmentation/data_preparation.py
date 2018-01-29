@@ -1,8 +1,7 @@
 import numpy as np
 
-from classification.create_data_paragraphs import build_topics_paragraphs_index_map
 import config
-from utils import load_pickle, create_dir, save_sparse_csr
+from utils import load_pickle, create_dir, save_sparse_csr, build_topics_paragraphs_index_map
 
 
 def line_map_to_y(lines):
