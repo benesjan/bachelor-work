@@ -1,54 +1,7 @@
 # coding: utf-8
-import numpy as np
-from matplotlib import pyplot, rc
-from sklearn.metrics import precision_recall_fscore_support as prfs
-
-from classification.create_classifier_paragraphs import threshold_half_max, process_y, threshold_biggest_gap
 import config
-from utils import load_pickle, build_corpus_and_topics, r_cut, load_sparse_csr, first_option
-
-
-def plot_thresholds(y_true, y_pred, ensure_topic=False, average_type='samples', calibrated=True):
-    threshold_array = np.arange(0 if calibrated else -1, 1.0, 0.01)
-
-    values = np.ones((threshold_array.shape[0], 4), dtype=np.float)
-
-    if ensure_topic:
-        # Ensures at least 1 predicted topic for each article
-        y_pred_min_topics = r_cut(y_pred, 1)
-    else:
-        y_pred_min_topics = 0
-
-    optimal_position = [-100, 0, 0, 0]
-
-    for i, T in enumerate(threshold_array):
-        y_classifier = y_pred_min_topics + (y_pred > T)
-
-        P, R, F, S = prfs(y_true, y_classifier, average=average_type)
-        values[i, :] = [T, F, P, R]
-
-        print('threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
-
-        if F > optimal_position[1]:
-            optimal_position = values[i, :]
-
-    rc('font', family='Arial')
-    pyplot.plot(values[:, 0], values[:, 1:4])
-    pyplot.legend(['F-measure', 'Precision', 'Recall'])
-
-    pyplot.grid()
-    pyplot.scatter(optimal_position[0], optimal_position[1], marker="x", s=300, linewidth=3.3)
-    pyplot.annotate('[%.2f, %.2f]' % (optimal_position[0], optimal_position[1]),
-                    [optimal_position[0], optimal_position[1] - 0.055])
-
-    pyplot.xlim([0 if calibrated else -1, 1])
-    pyplot.ylim([0, 1])
-
-    pyplot.title('Vývoj přesnosti, úplnosti a F-míry v závislosti na prahu')
-    pyplot.xlabel('Práh')
-
-    pyplot.show()
-
+from classification.create_classifier_paragraphs import threshold_half_max, process_y, threshold_biggest_gap
+from utils import load_pickle, build_corpus_and_topics, load_sparse_csr, first_option, plot_thresholds
 
 if __name__ == '__main__':
 

@@ -1,20 +1,27 @@
 import config
-from classification.optimal_threshold_discovery import plot_thresholds
 from segmentation.data_preparation import line_map_to_y
 from segmentation.distance_based_methods import compute_cosine_distance
-from utils import load_pickle, build_topics_paragraphs_index_map
+from utils import load_pickle, first_option, plot_thresholds, load_sparse_csr
 
 if __name__ == '__main__':
-    classifier = load_pickle(config.classifier_binary)
-    vectorizer = load_pickle(config.vectorizer)
+    data = config.get_par_data('held_out')
 
-    paragraphs, ignored, line_map = build_topics_paragraphs_index_map(config.data['held_out'])
+    if first_option('Do you want to use linear [l] or RBF [r] kernel?', 'l', 'r'):
+        classifier = load_pickle(config.classifier_linear)
+        interval = (-1, 1)
+    else:
+        classifier = load_pickle(config.classifier_rbf)
+        interval = (-10, 0)
 
-    y_true = line_map_to_y(line_map)
-    x = vectorizer.transform(paragraphs)
+    y_true = line_map_to_y(load_pickle(data['line_map']))
 
+    print("Loading x")
+    x = load_sparse_csr(data['x'])
+
+    print("Computing cosine distance")
     x_norms = compute_cosine_distance(x)
 
+    print("Predicting")
     y_pred = classifier.decision_function(x_norms)
 
-    plot_thresholds(y_true, y_pred, False, 'binary', False)
+    plot_thresholds(y_true, y_pred, False, 'binary', interval)

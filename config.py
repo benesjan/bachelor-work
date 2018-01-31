@@ -54,4 +54,5 @@ def get_seg_data(data_name):
     }
 
 
-classifier_binary = seg_data_dir + '/classifier_binary.pickle'
+classifier_linear = seg_data_dir + '/classifier_linear.pickle'
+classifier_rbf = seg_data_dir + '/classifier_rbf.pickle'

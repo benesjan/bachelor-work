@@ -20,11 +20,11 @@ if __name__ == '__main__':
 
         create_dir(data['dir'])
 
-        articles, topics, line_map = build_topics_paragraphs_index_map(data['text'])
+        paragraphs, topics, line_map = build_topics_paragraphs_index_map(data['text'])
         y_true = binarizer.transform(topics)
 
         print('Building the data matrix using the TfidfVectorizer')
-        x = vectorizer.transform(articles)
+        x = vectorizer.transform(paragraphs)
 
         print('Classifying...')
         y = classifier.predict_proba(x)

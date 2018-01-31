@@ -1,7 +1,7 @@
 import numpy as np
 
 import config
-from utils import load_pickle, create_dir, save_sparse_csr, build_topics_paragraphs_index_map
+from utils import load_pickle, create_dir, save_sparse_csr, build_topics_paragraphs_index_map, load_sparse_csr
 
 
 def line_map_to_y(lines):
@@ -19,34 +19,27 @@ def line_map_to_y(lines):
     return y_
 
 
-def get_next_data(data_names):
-    for name in data_names:
-        yield config.get_seg_data(name)
-
-
 if __name__ == '__main__':
     print('Loading the instances')
     classifier = load_pickle(config.classifier)
-    vectorizer = load_pickle(config.vectorizer)
 
-    for data in get_next_data(['held_out', 'test']):
-        print('Processing ' + data['name'] + ' data')
+    for data_name in ['held_out', 'test']:
+        print('Processing ' + data_name + ' data')
 
-        create_dir(data['dir'])
+        data_seg = config.get_seg_data(data_name)
+        data_par = config.get_par_data(data_name)
 
-        paragraphs, ignored, line_map = build_topics_paragraphs_index_map(data['text'])
+        create_dir(data_seg['dir'])
 
-        y_true = line_map_to_y(line_map)
+        y_true = line_map_to_y(load_pickle(data_par['line_map']))
 
-        print('Building the data matrix using the TfidfVectorizer')
-        x = vectorizer.transform(paragraphs)
-
-        del paragraphs, ignored, line_map, vectorizer
+        print("Loading x")
+        x = load_sparse_csr(data_par['x'])
 
         print('Classifying...')
         y = classifier.predict_proba(x)
 
         print('Saving the data')
-        save_sparse_csr(data['x'], x)
-        np.save(data['y'], y)
-        np.save(data['y_true'], y_true)
+        save_sparse_csr(data_seg['x'], x)
+        np.save(data_seg['y'], y)
+        np.save(data_seg['y_true'], y_true)

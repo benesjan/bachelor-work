@@ -3,7 +3,7 @@ from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import MinMaxScaler
 
 import config
-from classification.optimal_threshold_discovery import plot_thresholds
+from utils import plot_thresholds
 
 
 def compute_euclidean_distance(y):

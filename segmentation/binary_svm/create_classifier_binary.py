@@ -1,21 +1,19 @@
-from sklearn.metrics import precision_recall_fscore_support as prfs
+from sklearn.svm import LinearSVC, SVC
 
 import config
 from segmentation.data_preparation import line_map_to_y
 from segmentation.distance_based_methods import compute_cosine_distance
-from utils import load_pickle, first_option, load_sparse_csr
+from utils import load_pickle, save_pickle, first_option, load_sparse_csr
 
 if __name__ == '__main__':
-    data = config.get_par_data('test')
+    data = config.get_par_data('train')
 
     if first_option('Do you want to use linear [l] or RBF [r] kernel?', 'l', 'r'):
         path = config.classifier_linear
-        threshold = -0.55
+        classifier = LinearSVC(random_state=0)
     else:
         path = config.classifier_rbf
-        threshold = -5
-
-    classifier = load_pickle(path)
+        classifier = SVC(random_state=0, kernel='rbf')
 
     y_true = line_map_to_y(load_pickle(data['line_map']))
 
@@ -25,8 +23,8 @@ if __name__ == '__main__':
     print("Computing cosine distance")
     x_norms = compute_cosine_distance(x)
 
-    print("Predicting")
-    y_pred = classifier.decision_function(x_norms) > threshold
+    print("Classifier training")
+    classifier.fit(x_norms, y_true)
 
-    P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
+    print("Saving th classifier to: " + path)
+    save_pickle(path, classifier)
