@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     print("Loading the data")
     y = np.load(data['y'])
-    y_true = np.load(data['y_true'])
+    y_true = np.load(data['y_true_lm'])
 
     # y_norms = compute_euclidean_distance(y)
     y_norms = compute_cosine_distance(y)

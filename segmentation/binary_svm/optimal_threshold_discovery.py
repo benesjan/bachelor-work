@@ -1,10 +1,11 @@
+import numpy as np
+
 import config
-from segmentation.data_preparation import line_map_to_y
 from segmentation.distance_based_methods import compute_cosine_distance
 from utils import load_pickle, first_option, plot_thresholds, load_sparse_csr
 
 if __name__ == '__main__':
-    data = config.get_par_data('held_out')
+    data = config.get_seg_data('held_out')
 
     if first_option('Do you want to use linear [l] or RBF [r] kernel?', 'l', 'r'):
         classifier = load_pickle(config.classifier_linear)
@@ -13,7 +14,7 @@ if __name__ == '__main__':
         classifier = load_pickle(config.classifier_rbf)
         interval = (-10, 0)
 
-    y_true = line_map_to_y(load_pickle(data['line_map']))
+    y_true = np.load(data['y_true_lm'])
 
     print("Loading x")
     x = load_sparse_csr(data['x'])

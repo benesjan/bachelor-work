@@ -44,13 +44,15 @@ seg_data_dir = data_dir + '/segmentation'
 def get_seg_data(data_name):
     assert data_name in data.keys(), "Invalid data name"
     recent_dir = seg_data_dir + '/' + data_name + '/'
+    par_data = get_par_data(data_name)
     return {
         'dir': recent_dir,
         'name': data_name,
         'text': data[data_name],
-        'x': recent_dir + 'x.npz',
-        'y': recent_dir + 'y.npy',
-        'y_true': recent_dir + 'y_true.npy'
+        'x': par_data['x'],
+        'y': par_data['y'],
+        'y_true_lm': recent_dir + 'y_true_lm.npy',
+        'line_map': par_data['line_map']
     }
 
 

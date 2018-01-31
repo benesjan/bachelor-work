@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     print("Loading the data")
     y = np.load(data['y'])
-    y_true = np.load(data['y_true'])
+    y_true = np.load(data['y_true_lm'])
 
     cluster_range = range(2, 6)
     y_pred = np.zeros((y_true.shape[0], 1))

@@ -1,7 +1,7 @@
 import numpy as np
 
 import config
-from utils import load_pickle, create_dir, save_sparse_csr, build_topics_paragraphs_index_map, load_sparse_csr
+from utils import load_pickle, create_dir
 
 
 def line_map_to_y(lines):
@@ -19,27 +19,21 @@ def line_map_to_y(lines):
     return y_
 
 
+def get_next_data(data_names):
+    for name in data_names:
+        yield config.get_seg_data(name)
+
+
 if __name__ == '__main__':
     print('Loading the instances')
     classifier = load_pickle(config.classifier)
 
-    for data_name in ['held_out', 'test']:
-        print('Processing ' + data_name + ' data')
+    for data in get_next_data(config.data.keys()):
+        print('Processing ' + data['name'] + ' data')
 
-        data_seg = config.get_seg_data(data_name)
-        data_par = config.get_par_data(data_name)
+        create_dir(data['dir'])
 
-        create_dir(data_seg['dir'])
-
-        y_true = line_map_to_y(load_pickle(data_par['line_map']))
-
-        print("Loading x")
-        x = load_sparse_csr(data_par['x'])
-
-        print('Classifying...')
-        y = classifier.predict_proba(x)
+        y_true = line_map_to_y(load_pickle(data['line_map']))
 
         print('Saving the data')
-        save_sparse_csr(data_seg['x'], x)
-        np.save(data_seg['y'], y)
-        np.save(data_seg['y_true'], y_true)
+        np.save(data['y_true_lm'], y_true)

@@ -1,12 +1,12 @@
+import numpy as np
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
 import config
-from segmentation.data_preparation import line_map_to_y
 from segmentation.distance_based_methods import compute_cosine_distance
 from utils import load_pickle, first_option, load_sparse_csr
 
 if __name__ == '__main__':
-    data = config.get_par_data('test')
+    data = config.get_seg_data('test')
 
     if first_option('Do you want to use linear [l] or RBF [r] kernel?', 'l', 'r'):
         path = config.classifier_linear
@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     classifier = load_pickle(path)
 
-    y_true = line_map_to_y(load_pickle(data['line_map']))
+    y_true = np.load(data['y_true_lm'])
 
     print("Loading x")
     x = load_sparse_csr(data['x'])
