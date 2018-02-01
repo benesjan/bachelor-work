@@ -6,7 +6,7 @@ import numpy as np
 import config
 
 if __name__ == '__main__':
-    data = config.get_seg_data('held_out')
+    data = config.get_seg_data('test')
 
     print("Loading the data")
     y = np.load(data['y'])

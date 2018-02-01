@@ -1,9 +1,9 @@
 import numpy as np
+from sklearn.metrics import precision_recall_fscore_support as prfs
 from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import MinMaxScaler
 
 import config
-from utils import plot_thresholds
 
 
 def compute_euclidean_distance(y):
@@ -49,23 +49,58 @@ def neighbourhood_difference(y_n, epsilon=2):
     return y_p
 
 
+# Optimal threshold discovery
+# if __name__ == '__main__':
+#     data = config.get_seg_data('held_out')
+#
+#     print("Loading the data")
+#     y = np.load(data['y'])
+#     y_true = np.load(data['y_true_lm'])
+#
+#     # y_norms = compute_euclidean_distance(y)
+#     y_norms = compute_cosine_distance(y)
+#
+#     # best result euclidean: threshold = 0.5, F1 = 0.546 (P = 0.507, R = 0.592)
+#     # best result cosine: threshold = 0.92, F1 = 0.708 (P = 0.709, R = 0.706)
+#     y_pred = y_norms
+#
+#     # best result: window = 4, threshold = 0.42, F1 = 0.419 (P = 0.339, R = 0.550)
+#     # y_pred = slide_window(y_norms)
+#
+#     # best result: epsilon = 2, threshold = 0.46, F1 = 0.515 (P = 0.468, R = 0.573)
+#     # y_pred = neighbourhood_difference(y_norms)
+#
+#     plot_thresholds(y_true, y_pred, False, 'binary')
+
+# Measurements on test data
 if __name__ == '__main__':
-    data = config.get_seg_data('held_out')
+    data = config.get_seg_data('test')
 
     print("Loading the data")
     y = np.load(data['y'])
     y_true = np.load(data['y_true_lm'])
 
-    # y_norms = compute_euclidean_distance(y)
+    T = 0.5
+    y_pred = compute_euclidean_distance(y) > T
+    P, R, F, S = prfs(y_true, y_pred, average='binary')
+    print('compute_euclidean_distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
+
     y_norms = compute_cosine_distance(y)
 
-    # best result: threshold = 0.92, F1 = 0.708 (P = 0.709, R = 0.706)
-    y_pred = y_norms
+    T = 0.92
+    y_pred = y_norms > T
+    P, R, F, S = prfs(y_true, y_pred, average='binary')
+    print('compute_cosine_distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
 
-    # best result: window = 4, threshold = 0.42, F1 = 0.419 (P = 0.339, R = 0.550)
-    # y_pred = slide_window(y_norms)
+    T = 0.42
+    window_size = 4
+    y_pred = slide_window(y_norms, window_size=window_size) > T
+    P, R, F, S = prfs(y_true, y_pred, average='binary')
+    print('slide_window: threshold = %.2f, window_size = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
+    T, window_size, F, P, R))
 
-    # best result: epsilon = 2, threshold = 0.46, F1 = 0.515 (P = 0.468, R = 0.573)
-    # y_pred = neighbourhood_difference(y_norms)
-
-    plot_thresholds(y_true, y_pred, False, 'binary')
+    epsilon = 2
+    T = 0.46
+    y_pred = neighbourhood_difference(y_norms, epsilon=epsilon) > T
+    P, R, F, S = prfs(y_true, y_pred, average='binary')
+    print('neighbourhood_difference: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, epsilon, F, P, R))
