@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.metrics import precision_recall_fscore_support as prfs
 
 import config
-from segmentation.distance_based_methods import compute_cosine_distance
+from segmentation.distance_based_methods import compute_distance
 from utils import load_pickle, first_option, load_sparse_csr
 
 if __name__ == '__main__':
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     x = load_sparse_csr(data['x'])
 
     print("Computing cosine distance")
-    x_norms = compute_cosine_distance(x)
+    x_norms = compute_distance(x)
 
     print("Predicting")
     y_pred = classifier.decision_function(x_norms) > threshold

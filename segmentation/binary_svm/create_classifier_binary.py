@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.svm import LinearSVC, SVC
 
 import config
-from segmentation.distance_based_methods import compute_cosine_distance
+from segmentation.distance_based_methods import compute_distance
 from utils import save_pickle, first_option, load_sparse_csr
 
 if __name__ == '__main__':
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     x = load_sparse_csr(data['x'])
 
     print("Computing cosine distance")
-    x_norms = compute_cosine_distance(x)
+    x_norms = compute_distance(x)
 
     print("Classifier training")
     classifier.fit(x_norms, y_true)

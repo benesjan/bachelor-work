@@ -1,37 +1,21 @@
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support as prfs
-from sklearn.metrics.pairwise import cosine_distances
+from sklearn.metrics.pairwise import cosine_distances, euclidean_distances
 from sklearn.preprocessing import MinMaxScaler
 
 import config
 
 
-def compute_euclidean_distance(y):
+def compute_distance(y, distance_func=cosine_distances):
     """
+    :param distance_func: function which computes the distance between 2 vectors, has to follow metrics.pairwise API
     :param y: prediction matrix
     :return: vector with euclidean distances of every 2 consecutive vectors within the prediction matrix
     """
     y_n = np.zeros((y.shape[0] - 1, 1))
     for i in range(y.shape[0] - 1):
-        y_n[i] = np.linalg.norm(y[i, :] - y[i + 1, :])
+        y_n[i] = distance_func(y[i:(i + 1), :], y[(i + 1):(i + 2), :])
     return MinMaxScaler().fit_transform(y_n)
-
-
-def compute_cosine_distance(y):
-    """
-    Much better performance then euclidean distance - Euclidean distance is susceptible to documents being clustered
-    by their L2-norm (magnitude, in the 2 dimensional case) instead of direction. I.e. vectors with quite different
-    directions would be clustered because their distances from origin are similar.
-    :param y: prediction matrix
-    :return: vector with cosine distances of every 2 consecutive vectors within the prediction matrix
-    """
-    y_n = np.zeros((y.shape[0] - 1, 1))
-    for i in range(y.shape[0] - 1):
-        y_n[i] = cosine_distances(y[i:(i + 1), :], y[(i + 1):(i + 2), :])
-
-    # No need for scaling to interval <0, 1> because the vectors are only of positive values hence the cosine distance
-    # is naturally bounded by <0, 1>
-    return y_n
 
 
 def slide_window(y_n, window_size=4):
@@ -57,8 +41,8 @@ def neighbourhood_difference(y_n, epsilon=2):
 #     y = np.load(data['y'])
 #     y_true = np.load(data['y_true_lm'])
 #
-#     # y_norms = compute_euclidean_distance(y)
-#     y_norms = compute_cosine_distance(y)
+#     # y_norms = compute_distance(y, euclidean_distances)
+#     y_norms = compute_distance(y, cosine_distances)
 #
 #     # best result euclidean: threshold = 0.5, F1 = 0.546 (P = 0.507, R = 0.592)
 #     # best result cosine: threshold = 0.92, F1 = 0.708 (P = 0.709, R = 0.706)
@@ -81,11 +65,11 @@ if __name__ == '__main__':
     y_true = np.load(data['y_true_lm'])
 
     T = 0.5
-    y_pred = compute_euclidean_distance(y) > T
+    y_pred = compute_distance(y, euclidean_distances) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
     print('compute_euclidean_distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
 
-    y_norms = compute_cosine_distance(y)
+    y_norms = compute_distance(y, cosine_distances)
 
     T = 0.92
     y_pred = y_norms > T
@@ -97,10 +81,11 @@ if __name__ == '__main__':
     y_pred = slide_window(y_norms, window_size=window_size) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
     print('slide_window: threshold = %.2f, window_size = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
-    T, window_size, F, P, R))
+        T, window_size, F, P, R))
 
     epsilon = 2
     T = 0.46
     y_pred = neighbourhood_difference(y_norms, epsilon=epsilon) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('neighbourhood_difference: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, epsilon, F, P, R))
+    print('neighbourhood_difference: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
+        T, epsilon, F, P, R))
