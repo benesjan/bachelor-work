@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support as prfs
-from sklearn.metrics.pairwise import cosine_distances, euclidean_distances
+from sklearn.metrics.pairwise import cosine_distances, euclidean_distances, manhattan_distances
 from sklearn.preprocessing import MinMaxScaler
 
 import config
@@ -43,9 +43,11 @@ def neighbourhood_difference(y_n, epsilon=2):
 #
 #     # y_norms = compute_distance(y, euclidean_distances)
 #     y_norms = compute_distance(y, cosine_distances)
+#     # y_norms = compute_distance(y, manhattan_distances)
 #
 #     # best result euclidean: threshold = 0.5, F1 = 0.546 (P = 0.507, R = 0.592)
 #     # best result cosine: threshold = 0.92, F1 = 0.708 (P = 0.709, R = 0.706)
+#     # best result manhattan: threshold = 0.33, F1 = 0.537 (P = 0.474, R = 0.620)
 #     y_pred = y_norms
 #
 #     # best result: window = 4, threshold = 0.42, F1 = 0.419 (P = 0.339, R = 0.550)
@@ -67,25 +69,30 @@ if __name__ == '__main__':
     T = 0.5
     y_pred = compute_distance(y, euclidean_distances) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('compute_euclidean_distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
+    print('euclidean distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
 
     y_norms = compute_distance(y, cosine_distances)
 
     T = 0.92
     y_pred = y_norms > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('compute_cosine_distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
+    print('cosine distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
+
+    T = 0.33
+    y_pred = compute_distance(y, manhattan_distances) > T
+    P, R, F, S = prfs(y_true, y_pred, average='binary')
+    print('manhattan distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
 
     T = 0.42
     window_size = 4
     y_pred = slide_window(y_norms, window_size=window_size) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('slide_window: threshold = %.2f, window_size = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
+    print('slide_window, cosine distance: threshold = %.2f, window_size = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
         T, window_size, F, P, R))
 
     epsilon = 2
     T = 0.46
     y_pred = neighbourhood_difference(y_norms, epsilon=epsilon) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('neighbourhood_difference: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
+    print('neighbourhood_difference, cosine distance: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
         T, epsilon, F, P, R))
