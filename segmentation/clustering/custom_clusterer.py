@@ -43,7 +43,7 @@ class CustomClusterer:
             else:
                 # Compute new distance between the new cluster center and the next cluster center
                 dists[cluster1_start] = cosine_distances(y[cluster1_start:cluster1_start + 1, :],
-                                                         y[new_cluster_size:new_cluster_size + 1, :])
+                                                         y[next_cluster_center:next_cluster_center + 1, :])
 
             n_clusters_current -= 1
 
