@@ -7,7 +7,7 @@ class CustomClusterer:
     n_clusters = None
 
     def __init__(self, n_clusters=4):
-        self._n_clusters = n_clusters
+        self.n_clusters = n_clusters
 
     def fit_predict(self, y):
         # Append value at the position of last vector in the y selection

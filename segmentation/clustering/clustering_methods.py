@@ -21,6 +21,7 @@ if __name__ == '__main__':
     window_size = 20
     one_percent = int(y.shape[0] / 100) if y.shape[0] > 100 else 1
 
+    print("Clustering...")
     for i in range(0, y.shape[0] - window_size, window_size):
         # for i in range(0, 40, window_size):
         y_select = y[i:(i + window_size), :]
