@@ -58,4 +58,3 @@ if __name__ == '__main__':
     P, R, F, S = prfs(y_true, y_pred, average='binary')
 
     print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
-    # F1 = 0.419 (P = 0.301, R = 0.692)
