@@ -6,8 +6,9 @@ from sklearn.preprocessing import MinMaxScaler
 import config
 
 
-def compute_distance(y, distance_func=cosine_distances):
+def compute_distance(y, distance_func=cosine_distances, scale=True):
     """
+    :param scale: Parameter which sets whether the distances should be scaled between 0 and 1
     :param distance_func: function which computes the distance between 2 vectors, has to follow metrics.pairwise API
     :param y: prediction matrix
     :return: vector with euclidean distances of every 2 consecutive vectors within the prediction matrix
@@ -15,7 +16,8 @@ def compute_distance(y, distance_func=cosine_distances):
     y_n = np.zeros((y.shape[0] - 1, 1))
     for i in range(y.shape[0] - 1):
         y_n[i] = distance_func(y[i:(i + 1), :], y[(i + 1):(i + 2), :])
-    return MinMaxScaler().fit_transform(y_n)
+
+    return MinMaxScaler().fit_transform(y_n) if scale else y_n
 
 
 def slide_window(y_n, window_size=4):
@@ -87,12 +89,12 @@ if __name__ == '__main__':
     window_size = 4
     y_pred = slide_window(y_norms, window_size=window_size) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('slide_window, cosine distance: threshold = %.2f, window_size = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
-        T, window_size, F, P, R))
+    print('slide_window, cosine distance: threshold = %.2f, window_size = %.0f, F1 = %.3f (P = %.3f, R = %.3f)'
+          % (T, window_size, F, P, R))
 
     epsilon = 2
     T = 0.46
     y_pred = neighbourhood_difference(y_norms, epsilon=epsilon) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('neighbourhood_difference, cosine distance: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)' % (
-        T, epsilon, F, P, R))
+    print('neighbourhood_difference, cosine distance: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)'
+          % (T, epsilon, F, P, R))

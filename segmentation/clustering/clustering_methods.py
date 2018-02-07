@@ -4,8 +4,12 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 import config
+from segmentation.clustering.custom_clusterer import CustomClusterer
+from utils import first_option
 
 if __name__ == '__main__':
+    custom_clusterer = first_option('Do you want to custom implementation of clusterer [c] or k-means [k]?', 'c', 'k')
+
     data = config.get_seg_data('test')
 
     print("Loading the data")
@@ -27,7 +31,11 @@ if __name__ == '__main__':
         for n_clusters in cluster_range:
             # Initialize the clusterer with n_clusters value and a random generator
             # seed of 10 for reproducibility.
-            clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+            if custom_clusterer:
+                clusterer = CustomClusterer(n_clusters=n_clusters)
+            else:
+                clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+
             cluster_labels = clusterer.fit_predict(y_select)
 
             # The silhouette_score gives the average value for all the samples.
