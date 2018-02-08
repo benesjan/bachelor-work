@@ -16,34 +16,42 @@ class CustomClusterer:
         n_clusters_current = y.shape[0]
 
         while n_clusters_current != self.n_clusters:
-            cluster1_start = np.argmin(dists)
+            cluster1_center = np.argmin(dists)
 
-            cluster1_size = self._get_cluster_size(dists, cluster1_start)
+            cluster1_size = self._get_cluster_size(dists, cluster1_center)
 
-            cluster2_start = cluster1_start + cluster1_size
+            cluster2_center = cluster1_center + cluster1_size
 
-            cluster2_size = self._get_cluster_size(dists, cluster2_start)
+            cluster2_size = self._get_cluster_size(dists, cluster2_center)
 
             new_cluster_size = cluster1_size + cluster2_size
 
             # Compute new cluster center
-            y[cluster1_start, :] = np.sum([y[cluster1_start, :] * cluster1_size, y[cluster2_start, :] * cluster2_size],
-                                          axis=0) / new_cluster_size
+            y[cluster1_center, :] = np.sum(
+                [y[cluster1_center, :] * cluster1_size, y[cluster2_center, :] * cluster2_size],
+                axis=0) / new_cluster_size
 
             # Set the invalidated distances to 10
-            dists[cluster2_start] = 10
+            dists[cluster2_center] = 10
 
             # Set the invalidated predictions to 0
             # just for debugging, because clusters are mapped using the vector of distances
-            # y[cluster2_start, :] = 0
+            # y[cluster2_center, :] = 0
 
-            next_cluster_center = cluster1_start + new_cluster_size
+            # Recompute the distance to the previous cluster if the current cluster is not at the beginning of sequence
+            if cluster1_center != 0:
+                prev_cluster_center = self._get_previous_cluster_center(dists, cluster1_center)
+                dists[prev_cluster_center] = cosine_distances(y[prev_cluster_center:prev_cluster_center + 1, :],
+                                                              y[cluster1_center:cluster1_center + 1, :])
+
+            # Recompute the distance to the next cluster
+            # If the current cluster is at the end of sequence set big dummy value
+            next_cluster_center = cluster1_center + new_cluster_size
             if next_cluster_center == dists.shape[0]:
-                dists[cluster1_start] = 100
+                dists[cluster1_center] = 100
             else:
-                # Compute new distance between the new cluster center and the next cluster center
-                dists[cluster1_start] = cosine_distances(y[cluster1_start:cluster1_start + 1, :],
-                                                         y[next_cluster_center:next_cluster_center + 1, :])
+                dists[cluster1_center] = cosine_distances(y[cluster1_center:cluster1_center + 1, :],
+                                                          y[next_cluster_center:next_cluster_center + 1, :])
 
             n_clusters_current -= 1
 
@@ -57,14 +65,21 @@ class CustomClusterer:
 
         return labels
 
-    def _get_cluster_size(self, dists, cluster_start):
-        # find the index of next valid distance
-        assert dists[cluster_start] != 10, "invalid cluster start"
+    def _get_cluster_size(self, dists, center):
+        assert dists[center] != 10, "Invalid cluster center"
 
         cluster_size = 1
-        for j in range(cluster_start + 1, dists.shape[0]):
+        for j in range(center + 1, dists.shape[0]):
             if dists[j] != 10:
                 break
             cluster_size += 1
 
         return cluster_size
+
+    def _get_previous_cluster_center(self, dists, center):
+        assert center != 0, "Invalid cluster center"
+
+        # Iterate from (current center -1) to 0
+        for j in range(center - 1, -1, -1):
+            if dists[j] != 10:
+                return j
