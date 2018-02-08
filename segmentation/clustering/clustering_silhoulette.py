@@ -8,7 +8,8 @@ from segmentation.clustering.custom_clusterer import CustomClusterer
 from utils import first_option
 
 if __name__ == '__main__':
-    custom_clusterer = first_option('Do you want to custom implementation of clusterer [c] or k-means [k]?', 'c', 'k')
+    custom_clusterer = first_option('Do you want to use custom implementation of clusterer [c] or k-means [k]?',
+                                    'c', 'k')
 
     data = config.get_seg_data('test')
 
