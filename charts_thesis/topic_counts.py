@@ -25,8 +25,6 @@ if __name__ == '__main__':
 
     rc('font', **font)
 
-    fig = pyplot.figure()
-
     pyplot.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
 
     pyplot.xlim([0, 11])

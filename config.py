@@ -58,3 +58,5 @@ def get_seg_data(data_name):
 
 classifier_linear = seg_data_dir + '/classifier_linear.pickle'
 classifier_rbf = seg_data_dir + '/classifier_rbf.pickle'
+
+lstm_model = seg_data_dir + '/lstm_model.h5'
