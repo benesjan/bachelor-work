@@ -48,6 +48,7 @@ if __name__ == '__main__':
     model.add(LSTM(100, input_shape=(1, 577)))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=20, batch_size=64)
+    # batch_size=500000 in order to propagate all the data at once
+    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=500000)
 
     model.save(config.lstm_model)
