@@ -1,11 +1,14 @@
 import numpy as np
 from keras import Sequential
-from keras.layers import LSTM, Dense
+from keras.layers import LSTM, Dense, Dropout
+from keras.models import load_model
+from pathlib import Path
 
 import config
+from utils import first_option
 
 
-def change_data_ratio(train, test, ratio=0.7):
+def change_data_ratio(train, test, ratio=0.7, steps=200):
     """
     Split data according to new ratio
     :param train: path to train data
@@ -16,7 +19,6 @@ def change_data_ratio(train, test, ratio=0.7):
     if ratio < 0.1 or ratio > 0.95:
         raise ValueError("Invalid ratio value: " + str(ratio))
 
-    print("Loading the predictions and thematic boundaries")
     x_tr = np.load(train['y'])
     y_tr = np.load(train['y_true_lm'])
 
@@ -26,9 +28,12 @@ def change_data_ratio(train, test, ratio=0.7):
     x = np.concatenate((x_tr, x_te), axis=0)
     y = np.concatenate((y_tr, np.ones((1, 1)), y_te))
 
-    num_of_train_rows = int(x.shape[0] * 0.7)
+    num_train_rows = int(x.shape[0] * 0.7)
 
-    return [x[0:num_of_train_rows], y[0:num_of_train_rows - 1], x[num_of_train_rows:, :], y[num_of_train_rows:]]
+    # Minimizes data loss
+    num_train_rows = int(num_train_rows / steps) * steps
+
+    return [x[0:num_train_rows], y[0:num_train_rows - 1], x[num_train_rows:, :], y[num_train_rows:]]
 
 
 def process_data(x, steps=200):
@@ -41,15 +46,34 @@ def process_data(x, steps=200):
     return np.array(x_list)
 
 
+def build_model(time_steps=200):
+    model = Sequential()
+
+    # stateful=True means that the state is propagated to the next batch
+    model.add(LSTM(100, input_shape=(time_steps, 577), stateful=stateful))
+    model.add(Dropout(0.5))
+    model.add(Dense(time_steps, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    return model
+
+
 if __name__ == '__main__':
+
     # If true, stateful LSTM will be used and batch shuffling will be disabled
     stateful = False
 
     # Number of vectors in one sequence, input data structure [samples, time_steps, features]
     time_steps = 200
 
+    if Path(config.lstm_model).is_file() and first_option('Do you want continue training saved model?', 'y', 'n'):
+        model = load_model(config.lstm_model)
+    else:
+        model = build_model(time_steps)
+
+    print("Processing the data")
     [X_train, y_train, X_test, y_test] = change_data_ratio(config.get_seg_data('held_out'), config.get_seg_data('test'),
-                                                           ratio=0.7)
+                                                           ratio=0.7, steps=time_steps)
     np.random.seed(7)
 
     # Split the 2D matrix to 3D matrix of dimensions [samples, time_steps, features]
@@ -65,14 +89,7 @@ if __name__ == '__main__':
     y_train = process_data(y_train)
     y_test = process_data(y_test)
 
-    model = Sequential()
-
-    # stateful=True means that the state is propagated to the next batch
-    model.add(LSTM(100, input_shape=(time_steps, 577), stateful=stateful))
-
-    model.add(Dense(time_steps, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=40, batch_size=1, shuffle=(not stateful))
+    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=801, shuffle=(not stateful))
 
     model.save(config.lstm_model)
 
