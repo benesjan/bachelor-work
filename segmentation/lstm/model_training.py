@@ -46,29 +46,28 @@ def process_data(x, steps=200):
     return np.array(x_list)
 
 
-def build_model(time_steps=200):
-    model = Sequential()
+def build_model(_time_steps=200):
+    _model = Sequential()
 
     # stateful=True means that the state is propagated to the next batch
-    model.add(LSTM(100, input_shape=(time_steps, 577), stateful=stateful))
-    model.add(Dropout(0.5))
-    model.add(Dense(time_steps, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    _model.add(LSTM(32, input_shape=(_time_steps, 577), stateful=False))
+    _model.add(Dropout(0.5))
+    _model.add(Dense(_time_steps, activation='sigmoid'))
+    _model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    return model
+    return _model
 
 
 if __name__ == '__main__':
-
-    # If true, stateful LSTM will be used and batch shuffling will be disabled
-    stateful = False
-
     # Number of vectors in one sequence, input data structure [samples, time_steps, features]
     time_steps = 200
 
-    if Path(config.lstm_model).is_file() and first_option('Do you want continue training saved model?', 'y', 'n'):
+    if Path(config.lstm_model).is_file() and first_option('Do you want to continue training the saved model?',
+                                                          'y', 'n'):
+        print("Loading new model")
         model = load_model(config.lstm_model)
     else:
+        print("Building new model")
         model = build_model(time_steps)
 
     print("Processing the data")
@@ -89,7 +88,7 @@ if __name__ == '__main__':
     y_train = process_data(y_train)
     y_test = process_data(y_test)
 
-    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=801, shuffle=(not stateful))
+    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=1, shuffle=True)
 
     model.save(config.lstm_model)
 
