@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_distances
 
 import config
 from segmentation.distance_based_methods import compute_distance
-from segmentation.lstm.lstm_utils import split_to_time_steps, change_data_ratio
+from segmentation.lstm.lstm_utils import split_to_time_steps, get_data
 from utils import first_option, plot_thresholds
 
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     np.random.seed(7)
 
     if Path(config.lstm_model_1).is_file() and first_option('Do you want to continue training the saved model?',
-                                                          'y', 'n'):
+                                                            'y', 'n'):
         print("Loading new model")
         model = load_model(config.lstm_model_1)
     else:
@@ -38,8 +38,7 @@ if __name__ == '__main__':
         model = build_model(time_steps)
 
     print("Processing the data")
-    [X_train, y_train, X_test, y_test] = change_data_ratio(config.get_seg_data('held_out'), config.get_seg_data('test'),
-                                                           ratio=0.7, steps=time_steps)
+    [X_train, y_train, X_held, y_held, X_test, y_test] = get_data(time_steps)
 
     print("Computing the distances")
     X_train = compute_distance(X_train, cosine_distances)

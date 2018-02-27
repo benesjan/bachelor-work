@@ -6,7 +6,7 @@ from keras.layers import LSTM, Dense, TimeDistributed
 from keras.models import load_model
 
 import config
-from segmentation.lstm.lstm_utils import split_to_time_steps, change_data_ratio
+from segmentation.lstm.lstm_utils import split_to_time_steps, get_data
 from utils import first_option
 
 
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     np.random.seed(7)
 
     if Path(config.lstm_model_577).is_file() and first_option('Do you want to continue training the saved model?',
-                                                          'y', 'n'):
+                                                              'y', 'n'):
         print("Loading new model")
         model = load_model(config.lstm_model_577)
     else:
@@ -36,8 +36,8 @@ if __name__ == '__main__':
         model = build_model(time_steps)
 
     print("Processing the data")
-    [X_train, y_train, X_test, y_test] = change_data_ratio(config.get_seg_data('held_out'), config.get_seg_data('test'),
-                                                           ratio=0.7, steps=time_steps)
+
+    [X_train, y_train, X_held, y_held, X_test, y_test] = get_data(time_steps)
 
     # Split the 2D matrix to 3D matrix of dimensions [samples, time_steps, features]
     X_train = split_to_time_steps(X_train)
@@ -46,6 +46,7 @@ if __name__ == '__main__':
     # Append 0 value to the beginning of y so the values represent if there was a boundary between current sample and
     # the previous one, not the current and next
     y_train = np.append(0, y_train)
+    y_held = np.append(0, y_held)
     y_test = np.append(0, y_test)
 
     # Split the 1D vector to 2D matrix of dimensions: [samples, time_steps]
