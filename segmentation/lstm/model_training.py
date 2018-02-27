@@ -6,7 +6,7 @@ from keras.layers import LSTM, Dense, TimeDistributed
 from keras.models import load_model
 
 import config
-from segmentation.lstm.lstm_utils import split_to_time_steps, get_data
+from segmentation.lstm.lstm_utils import split_to_time_steps, get_data, shuffle_the_data
 from utils import first_option
 
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # Number of vectors in one sequence, input data structure [samples, time_steps, features]
     time_steps = 200
 
-    np.random.seed(7)
+    # np.random.seed(7)
 
     if Path(config.lstm_model_577).is_file() and first_option('Do you want to continue training the saved model?',
                                                               'y', 'n'):
@@ -37,26 +37,33 @@ if __name__ == '__main__':
 
     print("Processing the data")
 
-    [X_train, y_train, X_held, y_held, X_test, y_test] = get_data(time_steps)
+    [X_train_or, y_train_or, X_held, y_held, X_test, y_test] = get_data(time_steps)
 
     # Split the 2D matrix to 3D matrix of dimensions [samples, time_steps, features]
-    X_train = split_to_time_steps(X_train)
     X_test = split_to_time_steps(X_test)
 
     # Append 0 value to the beginning of y so the values represent if there was a boundary between current sample and
     # the previous one, not the current and next
-    y_train = np.append(0, y_train)
+    y_train_or = np.append(0, y_train_or)
     y_held = np.append(0, y_held)
     y_test = np.append(0, y_test)
 
     # Split the 1D vector to 2D matrix of dimensions: [samples, time_steps]
-    y_train = split_to_time_steps(y_train)
     y_test = split_to_time_steps(y_test)
 
-    y_train = np.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
     y_test = np.reshape(y_test, (y_test.shape[0], y_test.shape[1], 1))
 
-    model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=400, shuffle=True)
+    shuffling_epochs = 50
+    for i in range(shuffling_epochs):
+        print("Shuffling epoch " + str(i) + "/" + str(shuffling_epochs))
+
+        [X_train, y_train] = shuffle_the_data(X_train_or, y_train_or)
+
+        X_train = split_to_time_steps(X_train_or)
+        y_train = split_to_time_steps(y_train_or)
+        y_train = np.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
+
+        model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=100, shuffle=False)
 
     model.save(config.lstm_model_577)
 
