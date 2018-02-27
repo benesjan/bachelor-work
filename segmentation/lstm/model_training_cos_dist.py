@@ -1,52 +1,15 @@
-import numpy as np
-from keras import Sequential
-from keras.layers import LSTM, Dense, Dropout, TimeDistributed
-from keras.models import load_model
 from pathlib import Path
 
+import numpy as np
+from keras import Sequential
+from keras.layers import LSTM, Dense, TimeDistributed
+from keras.models import load_model
 from sklearn.metrics.pairwise import cosine_distances
 
 import config
 from segmentation.distance_based_methods import compute_distance
+from segmentation.lstm.lstm_utils import split_to_time_steps, change_data_ratio
 from utils import first_option, plot_thresholds
-
-
-def change_data_ratio(train, test, ratio=0.7, steps=200):
-    """
-    Split data according to new ratio
-    :param train: path to train data
-    :param test: path to test data
-    :param ratio: ratio to split data by
-    :return: [X_train, y_train, X_test, y_test] split according to ratio
-    """
-    if ratio < 0.1 or ratio > 0.95:
-        raise ValueError("Invalid ratio value: " + str(ratio))
-
-    x_tr = np.load(train['y'])
-    y_tr = np.load(train['y_true_lm'])
-
-    x_te = np.load(test['y'])
-    y_te = np.load(test['y_true_lm'])
-
-    x = np.concatenate((x_tr, x_te), axis=0)
-    y = np.concatenate((y_tr, np.ones((1, 1)), y_te))
-
-    num_train_rows = int(x.shape[0] * 0.7)
-
-    # Minimizes data loss
-    num_train_rows = int(num_train_rows / steps) * steps
-
-    return [x[0:num_train_rows], y[0:num_train_rows - 1], x[num_train_rows:, :], y[num_train_rows:]]
-
-
-def split_to_time_steps(x, steps=200):
-    # Remove the last few training samples so that every time step consists of "steps" vectors
-    n = int(len(x) / steps) * steps
-    x_list = list()
-    for i in range(0, n, steps):
-        sample = x[i:i + steps]
-        x_list.append(sample)
-    return np.array(x_list)
 
 
 def build_model(_time_steps=200):
@@ -54,7 +17,6 @@ def build_model(_time_steps=200):
 
     # stateful=True means that the state is propagated to the next batch
     _model.add(LSTM(32, input_shape=(_time_steps, 1), stateful=False, return_sequences=True))
-    # _model.add(Dropout(0.5))
     _model.add(TimeDistributed(Dense(1, activation='sigmoid')))
     _model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -67,10 +29,10 @@ if __name__ == '__main__':
 
     np.random.seed(7)
 
-    if Path(config.lstm_model).is_file() and first_option('Do you want to continue training the saved model?',
+    if Path(config.lstm_model_1).is_file() and first_option('Do you want to continue training the saved model?',
                                                           'y', 'n'):
         print("Loading new model")
-        model = load_model(config.lstm_model)
+        model = load_model(config.lstm_model_1)
     else:
         print("Building new model")
         model = build_model(time_steps)
@@ -96,7 +58,7 @@ if __name__ == '__main__':
 
     model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=1000, batch_size=400, shuffle=True)
 
-    model.save(config.lstm_model)
+    model.save(config.lstm_model_1)
 
     print(model.summary())
 
