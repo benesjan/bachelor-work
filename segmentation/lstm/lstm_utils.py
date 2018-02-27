@@ -1,4 +1,6 @@
 import numpy as np
+from keras import Sequential
+from keras.layers import LSTM, TimeDistributed, Dense
 
 import config
 
@@ -82,3 +84,14 @@ def shuffle_the_data(X, y):
 
     X_shuffled = np.vstack(X_articles)
     return [X_shuffled, y_shuffled]
+
+
+def build_model(time_steps, n_features):
+    model = Sequential()
+
+    # stateful=True means that the state is propagated to the next batch
+    model.add(LSTM(32, input_shape=(time_steps, n_features), stateful=False, return_sequences=True))
+    model.add(TimeDistributed(Dense(1, activation='sigmoid')))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    return model
