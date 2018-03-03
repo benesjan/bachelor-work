@@ -20,9 +20,9 @@ if __name__ == '__main__':
     x = load_sparse_csr(data['x'])
 
     print("Computing cosine distance")
-    x_norms = compute_distance(x)
+    x_dists = compute_distance(x)
 
     print("Predicting")
-    y_pred = classifier.decision_function(x_norms)
+    y_pred = classifier.decision_function(x_dists)
 
     plot_thresholds(y_true, y_pred, False, 'binary', interval)
