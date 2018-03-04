@@ -1,6 +1,7 @@
 from pathlib import Path
 import numpy as np
 from keras.models import load_model
+from nltk import windowdiff, pk
 from sklearn.metrics import precision_recall_fscore_support as prfs
 from sklearn.metrics.pairwise import cosine_distances
 
@@ -43,7 +44,6 @@ def process_data(path, window=10):
 
     if leftover:
         X.append(leftover)
-        y.append(1)
 
     y = np.array(y)
     return [X, y]
@@ -87,3 +87,10 @@ if __name__ == '__main__':
 
     P, R, F, S = prfs(y_true.flatten(), y_pred.flatten(), average='binary')
     print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
+
+    y_true_joined = "".join(["" + str(x) for x in y_true.flatten()])
+    y_pred_joined = "".join(["" + "1" if x else "0" for x in y_pred.flatten()])
+    wd = windowdiff(y_true_joined, y_pred_joined, k=100, boundary="1")  # TODO: optimize k
+    pk_m = pk(y_true_joined, y_pred_joined, boundary="1")
+
+    print("WindowDiff = " + str(wd) + ", Pk = " + str(pk_m))
