@@ -13,18 +13,18 @@ if __name__ == '__main__':
     data = config.get_seg_data('test')
 
     print("Loading the data")
-    y = np.load(data['y'])
+    X = np.load(data['y'])
     y_true = np.load(data['y_true_lm'])
 
     cluster_range = range(2, 6)
     y_pred = np.zeros((y_true.shape[0], 1))
     window_size = 20
-    one_percent = int(y.shape[0] / 100) if y.shape[0] > 100 else 1
+    one_percent = int(X.shape[0] / 100) if X.shape[0] > 100 else 1
 
     print("Clustering...")
-    for i in range(0, y.shape[0] - window_size, window_size):
+    for i in range(0, X.shape[0] - window_size, window_size):
         # for i in range(0, 40, window_size):
-        y_select = y[i:(i + window_size), :]
+        X_select = X[i:(i + window_size), :]
 
         # Initialize the clusterer with n_clusters value and a random generator
         # seed of 10 for reproducibility.
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         else:
             clusterer = KMeans(n_clusters=n_clusters, random_state=10)
 
-        cluster_labels = clusterer.fit_predict(y_select)
+        cluster_labels = clusterer.fit_predict(X_select)
 
         for j in range(0, window_size - 1):
             if cluster_labels[j] != cluster_labels[j + 1]:
