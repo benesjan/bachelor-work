@@ -56,8 +56,8 @@ class CustomClusterer:
             n_clusters_current -= 1
 
         # Convert cluster distances to cluster labels
-        label = 0
-        labels = np.zeros((dists.shape[0], 1))
+        label = -1
+        labels = np.zeros((dists.shape[0]), dtype="uint8")
         for j in range(0, dists.shape[0]):
             if dists[j] != 10:
                 label += 1
