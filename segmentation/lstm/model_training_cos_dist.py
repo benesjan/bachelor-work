@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_distances
 
 import config
 from segmentation.distance_based_methods import compute_distance
-from segmentation.lstm.lstm_utils import split_to_time_steps, get_data, shuffle_the_data, build_model
+from segmentation.lstm.lstm_utils import split_to_time_steps, shuffle_the_data, build_model, plot_history
 from utils import first_option
 
 if __name__ == '__main__':
@@ -20,10 +20,15 @@ if __name__ == '__main__':
         print("Building new model")
         model = build_model(time_steps, 1)
 
-    print("Processing the data")
-    [X_train_or, y_train_or, X_held, y_held, X_test, y_test] = get_data(time_steps)
+    print("Loading the data")
+    train = config.get_seg_data('train')
+    test = config.get_seg_data('test')
 
-    del X_held, y_held
+    X_train_or = np.load(train['y'])
+    y_train_or = np.load(train['y_true_lm'])
+
+    X_test = np.load(test['y'])
+    y_test = np.load(test['y_true_lm'])
 
     print("Computing the distances on test data")
     X_test = compute_distance(X_test, cosine_distances)
@@ -58,6 +63,7 @@ if __name__ == '__main__':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         y_train = np.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
 
-        model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=100, shuffle=False)
+        history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=100, shuffle=False)
+        plot_history(history)
 
     model.save(config.lstm_model_1)

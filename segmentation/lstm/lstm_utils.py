@@ -1,50 +1,7 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from keras import Sequential
 from keras.layers import LSTM, TimeDistributed, Dense
-
-import config
-
-
-def _split_in_half(X, y, steps):
-    """
-    Split the data in half
-    :param steps: number of steps/vectors in time sequence
-    :param X: data to split
-    :param y: labels to split
-    :return: [X_1st_half, y_1st_half, X_2nd_hald, y_2nd_half]
-    """
-
-    num_train_rows = int(X.shape[0] * 0.5)
-
-    # Minimizes the data loss
-    num_train_rows = int(num_train_rows / steps) * steps
-
-    return [X[0:num_train_rows], y[0:num_train_rows - 1], X[num_train_rows:, :], y[num_train_rows:]]
-
-
-def get_data(steps):
-    """
-    Split the data to train, test and held out data
-    :param steps: number of steps/vectors in time sequence
-    :return: train, test and held out data
-    """
-
-    held_out = config.get_seg_data('held_out')
-    test = config.get_seg_data('test')
-
-    X_ho = np.load(held_out['y'])
-    y_ho = np.load(held_out['y_true_lm'])
-
-    X_te = np.load(test['y'])
-    y_te = np.load(test['y_true_lm'])
-
-    X = np.concatenate((X_ho, X_te), axis=0)
-    y = np.concatenate((y_ho, np.ones((1, 1)), y_te))
-
-    [X_train, y_train, X_rest, y_rest] = _split_in_half(X, y, steps)
-    [X_held, y_held, X_test, y_test] = _split_in_half(X_rest, y_rest, steps)
-
-    return [X_train, y_train, X_held, y_held, X_test, y_test]
 
 
 def split_to_time_steps(x, steps=200):
@@ -95,3 +52,24 @@ def build_model(time_steps, n_features):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     return model
+
+
+def plot_history(history):
+    # list all data in history
+    print(history.history.keys())
+    # summarize history for accuracy
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()

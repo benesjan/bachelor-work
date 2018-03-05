@@ -1,10 +1,10 @@
+import numpy as np
 from keras.models import load_model
 from sklearn.metrics.pairwise import cosine_distances
-import numpy as np
 
 import config
 from segmentation.distance_based_methods import compute_distance
-from segmentation.lstm.lstm_utils import get_data, split_to_time_steps
+from segmentation.lstm.lstm_utils import split_to_time_steps
 from utils import first_option, plot_thresholds
 
 if __name__ == '__main__':
@@ -18,9 +18,10 @@ if __name__ == '__main__':
 
     time_steps = model.get_config()[0]['config']['batch_input_shape'][1]
 
-    [X_train, y_train, X_held, y_held, X_test, y_test] = get_data(time_steps)
+    held_out = config.get_seg_data('held_out')
 
-    del X_train, y_train, X_test, y_test
+    X_held = np.load(held_out['y'])
+    y_held = np.load(held_out['y_true_lm'])
 
     if cosine:
         print("Computing the distances")

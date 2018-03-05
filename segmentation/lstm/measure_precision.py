@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_distances
 
 import config
 from segmentation.distance_based_methods import compute_distance
-from segmentation.lstm.lstm_utils import get_data, split_to_time_steps
+from segmentation.lstm.lstm_utils import split_to_time_steps
 from utils import first_option
 
 if __name__ == '__main__':
@@ -14,17 +14,18 @@ if __name__ == '__main__':
                     'c', 'r'):
         cosine = True
         model = load_model(config.lstm_model_1)
-        T = 0.46
+        T = 0.45
     else:
         cosine = False
         model = load_model(config.lstm_model_577)
-        T = 0.45
+        T = 0.49
 
     time_steps = model.get_config()[0]['config']['batch_input_shape'][1]
 
-    [X_train, y_train, X_held, y_held, X_test, y_test] = get_data(time_steps)
+    test = config.get_seg_data('test')
 
-    del X_train, y_train, X_held, y_held
+    X_test = np.load(test['y'])
+    y_test = np.load(test['y_true_lm'])
 
     if cosine:
         print("Computing the distances")

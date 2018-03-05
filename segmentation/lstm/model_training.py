@@ -3,7 +3,7 @@ import numpy as np
 from keras.models import load_model
 
 import config
-from segmentation.lstm.lstm_utils import split_to_time_steps, get_data, shuffle_the_data, build_model
+from segmentation.lstm.lstm_utils import split_to_time_steps, shuffle_the_data, build_model, plot_history
 from utils import first_option
 
 if __name__ == '__main__':
@@ -18,11 +18,15 @@ if __name__ == '__main__':
         print("Building new model")
         model = build_model(time_steps, 577)
 
-    print("Processing the data")
+    print("Loading the data")
+    train = config.get_seg_data('train')
+    test = config.get_seg_data('test')
 
-    [X_train_or, y_train_or, X_held, y_held, X_test, y_test] = get_data(time_steps)
+    X_train_or = np.load(train['y'])
+    y_train_or = np.load(train['y_true_lm'])
 
-    del X_held, y_held
+    X_test = np.load(test['y'])
+    y_test = np.load(test['y_true_lm'])
 
     # Split the 2D matrix to 3D matrix of dimensions [samples, time_steps, features]
     X_test = split_to_time_steps(X_test)
@@ -37,7 +41,7 @@ if __name__ == '__main__':
 
     y_test = np.reshape(y_test, (y_test.shape[0], y_test.shape[1], 1))
 
-    shuffling_epochs = 50
+    shuffling_epochs = 5
     for i in range(shuffling_epochs):
         print("Shuffling epoch " + str(i) + "/" + str(shuffling_epochs))
 
@@ -47,6 +51,8 @@ if __name__ == '__main__':
         y_train = split_to_time_steps(y_train_or)
         y_train = np.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
 
-        model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=100, shuffle=False)
+        history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=100,
+                            shuffle=False)
+        plot_history(history)
 
     model.save(config.lstm_model_577)

@@ -71,8 +71,10 @@ if __name__ == '__main__':
         X = compute_distance(X, cosine_distances)
         model = load_model(config.lstm_model_1)
         T = 0.46
-        y_true = y_true[1:]
-        assert len(X) == len(y_true), "Dimensions do not match"
+        # T = 0.11
+        # y_true = y_true[1:]
+        assert len(X) == len(y_true), "Dimensions do not match: y.shape = " + str(y_true.shape) + " X.shape = " + str(
+            X.shape)
     else:
         cosine = False
         model = load_model(config.lstm_model_577)
