@@ -3,7 +3,7 @@ import numpy as np
 from keras.models import load_model
 
 import config
-from segmentation.lstm.lstm_utils import split_to_time_steps, shuffle_the_data, build_model, plot_history
+from segmentation.lstm.lstm_utils import split_to_time_steps, shuffle_the_data, build_model
 from utils import first_option, create_dir, save_pickle
 
 if __name__ == '__main__':
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     y_test = np.reshape(y_test, (y_test.shape[0], y_test.shape[1], 1))
 
-    shuffling_epochs = 5
+    shuffling_epochs = 2
     for i in range(shuffling_epochs):
         print("Shuffling epoch " + str(i) + "/" + str(shuffling_epochs))
 

@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from keras import Sequential
 from keras.layers import LSTM, TimeDistributed, Dense
@@ -52,24 +51,3 @@ def build_model(time_steps, n_features):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     return model
-
-
-def plot_history(history):
-    # list all data in history
-    print(history.history.keys())
-    # summarize history for accuracy
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
-    # summarize history for loss
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()

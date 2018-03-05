@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # Append 0 value to the beginning of y so the values represent if there was a boundary between current sample and
     # the previous one, not the current and next
     y_train_or = np.append(0, y_train_or)
-    shuffling_epochs = 5
+    shuffling_epochs = 2
     for i in range(shuffling_epochs):
         print("Shuffling epoch " + str(i) + "/" + str(shuffling_epochs))
 

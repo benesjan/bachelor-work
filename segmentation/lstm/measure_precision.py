@@ -14,11 +14,11 @@ if __name__ == '__main__':
                     'c', 'r'):
         cosine = True
         model = load_model(config.lstm_model_1)
-        T = 0.45
+        T = 0.41
     else:
         cosine = False
         model = load_model(config.lstm_model_577)
-        T = 0.49
+        T = 0.59
 
     time_steps = model.get_config()[0]['config']['batch_input_shape'][1]
 
