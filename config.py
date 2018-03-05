@@ -62,5 +62,7 @@ classifier_rbf = seg_data_dir + '/classifier_rbf.pickle'
 lstm_model_1 = seg_data_dir + '/lstm_model_1.h5'
 lstm_model_577 = seg_data_dir + '/lstm_model_577.h5'
 
+hist_dir = seg_data_dir + '/lstm_histories'
+
 # Live subtitles
 subtitles_path = data_dir + '/udalosti/txt'

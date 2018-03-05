@@ -5,8 +5,8 @@ from sklearn.metrics.pairwise import cosine_distances
 
 import config
 from segmentation.distance_based_methods import compute_distance
-from segmentation.lstm.lstm_utils import split_to_time_steps, shuffle_the_data, build_model, plot_history
-from utils import first_option
+from segmentation.lstm.lstm_utils import split_to_time_steps, shuffle_the_data, build_model
+from utils import first_option, create_dir, save_pickle
 
 if __name__ == '__main__':
     # Number of vectors in one sequence, input data structure [samples, time_steps, features]
@@ -19,6 +19,9 @@ if __name__ == '__main__':
     else:
         print("Building new model")
         model = build_model(time_steps, 1)
+
+    # Create dir for histories
+    create_dir(config.hist_dir)
 
     print("Loading the data")
     train = config.get_seg_data('train')
@@ -63,7 +66,9 @@ if __name__ == '__main__':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         y_train = np.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
 
-        history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=100, shuffle=False)
-        plot_history(history)
+        history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=100,
+                            shuffle=False)
+
+        save_pickle(config.hist_dir + "/history_1_" + str(i) + ".pickle", history.history)
 
     model.save(config.lstm_model_1)

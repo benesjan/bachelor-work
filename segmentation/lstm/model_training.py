@@ -4,7 +4,7 @@ from keras.models import load_model
 
 import config
 from segmentation.lstm.lstm_utils import split_to_time_steps, shuffle_the_data, build_model, plot_history
-from utils import first_option
+from utils import first_option, create_dir, save_pickle
 
 if __name__ == '__main__':
     # Number of vectors in one sequence, input data structure [samples, time_steps, features]
@@ -17,6 +17,9 @@ if __name__ == '__main__':
     else:
         print("Building new model")
         model = build_model(time_steps, 577)
+
+    # Create dir for histories
+    create_dir(config.hist_dir)
 
     print("Loading the data")
     train = config.get_seg_data('train')
@@ -53,6 +56,7 @@ if __name__ == '__main__':
 
         history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=100,
                             shuffle=False)
-        plot_history(history)
+
+        save_pickle(config.hist_dir + "/history_577_" + str(i) + ".pickle", history.history)
 
     model.save(config.lstm_model_577)
