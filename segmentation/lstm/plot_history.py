@@ -39,7 +39,7 @@ if __name__ == '__main__':
     plt.title('Model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='lower right')
+    plt.legend(['train', 'held out'], loc='lower right')
     plt.show()
 
     plt.plot(history['loss'])
@@ -47,6 +47,6 @@ if __name__ == '__main__':
     plt.title('Model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper right')
+    plt.legend(['train', 'held out'], loc='upper right')
 
     plt.show()

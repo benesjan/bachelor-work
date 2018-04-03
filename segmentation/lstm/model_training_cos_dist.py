@@ -25,24 +25,24 @@ if __name__ == '__main__':
 
     print("Loading the data")
     train = config.get_seg_data('train')
-    test = config.get_seg_data('test')
+    held_out = config.get_seg_data('held_out')
 
     X_train_or = np.load(train['y'])
     y_train_or = np.load(train['y_true_lm'])
 
-    X_test = np.load(test['y'])
-    y_test = np.load(test['y_true_lm'])
+    X_held_out = np.load(held_out['y'])
+    y_held_out = np.load(held_out['y_true_lm'])
 
     print("Computing the distances on test data")
-    X_test = compute_distance(X_test, cosine_distances)
+    X_held_out = compute_distance(X_held_out, cosine_distances)
 
     # Split the 2D matrix to 3D matrix of dimensions [samples, time_steps, features]
-    X_test = split_to_time_steps(X_test)
+    X_held_out = split_to_time_steps(X_held_out)
 
     # Split the 1D vector to 2D matrix of dimensions: [samples, time_steps]
-    y_test = split_to_time_steps(y_test)
+    y_held_out = split_to_time_steps(y_held_out)
 
-    y_test = np.reshape(y_test, (y_test.shape[0], y_test.shape[1], 1))
+    y_held_out = np.reshape(y_held_out, (y_held_out.shape[0], y_held_out.shape[1], 1))
 
     # Append 0 value to the beginning of y so the values represent if there was a boundary between current sample and
     # the previous one, not the current and next
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         y_train = np.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
 
-        history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=100,
+        history = model.fit(X_train, y_train, validation_data=(X_held_out, y_held_out), epochs=100, batch_size=100,
                             shuffle=False)
 
         save_pickle(config.hist_dir + "/history_1_" + str(i) + ".pickle", history.history)
