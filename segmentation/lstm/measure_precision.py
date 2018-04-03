@@ -18,7 +18,7 @@ if __name__ == '__main__':
     else:
         cosine = False
         model = load_model(config.lstm_model_577)
-        T = 0.59
+        T = 0.48
 
     time_steps = model.get_config()[0]['config']['batch_input_shape'][1]
 
