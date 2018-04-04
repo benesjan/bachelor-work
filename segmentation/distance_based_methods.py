@@ -4,6 +4,7 @@ from sklearn.metrics.pairwise import cosine_distances, euclidean_distances, manh
 from sklearn.preprocessing import MinMaxScaler
 
 import config
+from utils import print_measurements
 
 
 def compute_distance(y, distance_func=cosine_distances, scale=True):
@@ -73,30 +74,29 @@ if __name__ == '__main__':
     T = 0.5
     y_pred = compute_distance(y, euclidean_distances) > T
     P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('euclidean distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
+    print('euclidean distance: threshold = %.2f' % T)
+    print_measurements(y_true, y_pred)
 
     y_dists = compute_distance(y, cosine_distances)
 
     T = 0.92
     y_pred = y_dists > T
-    P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('cosine distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
+    print('cosine distance: threshold = %.2f' % T)
+    print_measurements(y_true, y_pred)
 
     T = 0.33
     y_pred = compute_distance(y, manhattan_distances) > T
-    P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('manhattan distance: threshold = %.2f, F1 = %.3f (P = %.3f, R = %.3f)' % (T, F, P, R))
+    print('manhattan distance: threshold = %.2f' % T)
+    print_measurements(y_true, y_pred)
 
     T = 0.42
     window_size = 4
     y_pred = slide_window(y_dists, window_size=window_size) > T
-    P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('slide_window, cosine distance: threshold = %.2f, window_size = %.0f, F1 = %.3f (P = %.3f, R = %.3f)'
-          % (T, window_size, F, P, R))
+    print('slide_window, cosine distance: threshold = %.2f' % T)
+    print_measurements(y_true, y_pred)
 
     epsilon = 2
     T = 0.46
     y_pred = neighbourhood_difference(y_dists, epsilon=epsilon) > T
-    P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('neighbourhood_difference, cosine distance: threshold = %.2f, epsilon = %.0f, F1 = %.3f (P = %.3f, R = %.3f)'
-          % (T, epsilon, F, P, R))
+    print('neighbourhood_difference, cosine distance: threshold = %.2f' % T)
+    print_measurements(y_true, y_pred)

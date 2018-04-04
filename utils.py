@@ -1,6 +1,7 @@
 # coding: utf-8
 import pickle
 from pathlib import Path
+from nltk import windowdiff, pk
 from scipy.sparse import csr_matrix
 import numpy as np
 from matplotlib import pyplot, rc
@@ -174,3 +175,19 @@ def plot_thresholds(y_true, y_pred, ensure_topic=False, average_type='samples', 
     pyplot.xlabel('Práh')
 
     pyplot.show()
+
+
+def print_measurements(y_true, y_pred):
+    y_true = y_true.flatten()
+    y_pred = y_pred.flatten()
+
+    P, R, F, S = prfs(y_true, y_pred, average='binary')
+
+    window_length = 4  # average segment length is 7.22 --> half is ~ 4
+
+    y_true_joined = "".join(["" + str(int(x)) for x in y_true])
+    y_pred_joined = "".join(["" + "1" if x else "0" for x in y_pred])
+    wd = windowdiff(y_true_joined, y_pred_joined, k=window_length, boundary="1")
+    pk_m = pk(y_true_joined, y_pred_joined, k=window_length, boundary="1")
+
+    print('F1 = {0:.3f} (P = {1:.3f}, R = {2:.3f}), WindowDiff = {3:.3f}, Pk = {4:.3f}'.format(F, P, R, wd, pk_m))

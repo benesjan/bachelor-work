@@ -5,7 +5,7 @@ import numpy as np
 
 import config
 from segmentation.clustering.custom_clusterer import CustomClusterer
-from utils import first_option
+from utils import first_option, print_measurements
 
 if __name__ == '__main__':
     custom_clusterer = first_option('Do you want to use custom implementation of clusterer [c] or k-means [k]?',
@@ -58,6 +58,4 @@ if __name__ == '__main__':
         if i != 0 and i % one_percent == 0:
             print("{0} % done".format(i / one_percent))
 
-    P, R, F, S = prfs(y_true, y_pred, average='binary')
-
-    print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
+    print_measurements(y_true, y_pred)

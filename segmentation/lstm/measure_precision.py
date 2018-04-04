@@ -1,12 +1,11 @@
 import numpy as np
 from keras.models import load_model
-from sklearn.metrics import precision_recall_fscore_support as prfs
 from sklearn.metrics.pairwise import cosine_distances
 
 import config
 from segmentation.distance_based_methods import compute_distance
 from segmentation.lstm.lstm_utils import split_to_time_steps
-from utils import first_option
+from utils import first_option, print_measurements
 
 if __name__ == '__main__':
 
@@ -38,5 +37,4 @@ if __name__ == '__main__':
 
     y_pred = model.predict(X) > T
 
-    P, R, F, S = prfs(y_true.flatten(), y_pred.flatten(), average='binary')
-    print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
+    print_measurements(y_true, y_pred)

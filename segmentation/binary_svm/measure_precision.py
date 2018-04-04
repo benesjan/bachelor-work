@@ -1,9 +1,8 @@
 import numpy as np
-from sklearn.metrics import precision_recall_fscore_support as prfs
 
 import config
 from segmentation.distance_based_methods import compute_distance
-from utils import load_pickle, first_option, load_sparse_csr
+from utils import load_pickle, first_option, load_sparse_csr, print_measurements
 
 if __name__ == '__main__':
     data = config.get_seg_data('test')
@@ -28,5 +27,4 @@ if __name__ == '__main__':
     print("Predicting")
     y_pred = classifier.decision_function(x_dists) > threshold
 
-    P, R, F, S = prfs(y_true, y_pred, average='binary')
-    print('F1 = %.3f (P = %.3f, R = %.3f)' % (F, P, R))
+    print_measurements(y_true, y_pred)
