@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_distances
 import config
 from segmentation.distance_based_methods import compute_distance
 from segmentation.lstm.lstm_utils import split_to_time_steps
-from utils import load_pickle, first_option
+from utils import load_pickle, first_option, print_measurements
 
 
 def process_data(path, window=10):
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     else:
         cosine = False
         model = load_model(config.lstm_model_577)
-        T = 0.59
+        T = 0.48
 
     time_steps = model.get_config()[0]['config']['batch_input_shape'][1]
 
@@ -135,9 +135,4 @@ if __name__ == '__main__':
 
     # plot_thresholds_pk(y_true, y_pred)
 
-    y_true_joined = "".join(["" + str(x) for x in y_true.flatten()])
-    y_pred_joined = "".join(["" + "1" if x else "0" for x in y_pred.flatten()])
-    wd = windowdiff(y_true_joined, y_pred_joined, k=100, boundary="1")  # TODO: optimize k
-    pk_m = pk(y_true_joined, y_pred_joined, boundary="1")
-
-    print("WindowDiff = " + str(wd) + ", Pk = " + str(pk_m))
+    print_measurements(y_true, y_pred, k=5) # TODO: optimize k
