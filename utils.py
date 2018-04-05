@@ -171,8 +171,8 @@ def plot_thresholds(y_true, y_pred, ensure_topic=False, average_type='samples', 
     pyplot.xlim(interval)
     pyplot.ylim([0, 1])
 
-    pyplot.title('Vývoj přesnosti, úplnosti a F-míry v závislosti na prahu')
-    pyplot.xlabel('Práh')
+    pyplot.title('Development of precision, recall and F measure depending on the threshold')
+    pyplot.xlabel('Threshold')
 
     pyplot.show()
 
